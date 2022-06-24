@@ -169,7 +169,7 @@ const decipher = crypto.createDecipheriv(algorithm, Securitykey, initVector);
 let decryptedData = decipher.update(encryptedpwd, "hex", "utf-8");
 decryptedData += decipher.final("utf8");
 res.send(decryptedData)
-// console.log("Decrypted message: " + decryptedData);
+console.log("Decrypted message: " + decryptedData);
 // if(decryptedData === pwd){
 //     res.send("Login successful")
 // }else{
