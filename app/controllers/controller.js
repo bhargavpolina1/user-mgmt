@@ -163,15 +163,16 @@ exports.loginUser = async(req,res) => {
         }
       ).then((data) => {
         if(data.length>0){
+            res.send("Login successful")
             // the decipher function
-            const encryptedpwd = data[0].pwd
-const decipher = crypto.createDecipheriv(algorithm, Securitykey, initVector);
-let decryptedData = decipher.update(encryptedpwd, "hex", "utf-8");
-decryptedData += decipher.final("utf8");
-res.send(decryptedData)
-//console.log("Decrypted message: " + decryptedData);
-//if(decryptedData === pwd){
-//     res.send("Login successful")
+//             const encryptedpwd = data[0].pwd
+// const decipher = crypto.createDecipheriv(algorithm, Securitykey, initVector);
+// let decryptedData = decipher.update(encryptedpwd, "hex", "utf-8");
+// decryptedData += decipher.final("utf8");
+// res.send(decryptedData)
+// console.log("Decrypted message: " + decryptedData);
+// if(decryptedData === pwd){
+// res.send("Login successful")
 // }else{
 //     res.status(500).send("Invalid email/ password comination!")
 
