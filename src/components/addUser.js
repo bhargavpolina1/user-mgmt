@@ -11,6 +11,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import validator from "validator";
+
+
   class UserDetails extends Component {
 
     state = {
@@ -58,7 +60,6 @@ import validator from "validator";
       stateToUpdate.nameError =
         "*Enter a valid name. It should contain only alphabets";
     } else {
-      console.log("Valid name")
       stateToUpdate.enteredName = enteredName;
       stateToUpdate.nameObtained = true;
       stateToUpdate.nameError = "";
@@ -193,14 +194,6 @@ import validator from "validator";
           this.state.enteredEmail,
           this.state.enteredPassword,
           this.state.confirmPassword)
-      // console.log(
-      //   this.state.enteredName,
-      //   this.state.enteredAge,
-      //   this.state.enteredMobileNumber,
-      //   this.state.enteredEmail,
-      //   this.state.enteredPassword,
-      //   this.state.confirmPassword
-      // )
 
       if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordMetRules){
         axios.post('http://localhost:8080/api/users/',{
