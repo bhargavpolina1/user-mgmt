@@ -1,27 +1,48 @@
 const db = require("../models");
 const User = db.users;
 const Op = db.Sequelize.Op;
+const express = require("express");
+const fileUpload = require("express-fileUpload");
+const path = require("path");
+const util = require("util");
+
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+app.use(fileUpload());
+
+
+
+
+
+
 const { QueryTypes } = require('sequelize');
 const sequelize = require("sequelize")
 
 const {userSchema} = require("../schema_validator/userSchema")
 const crypto = require ("crypto");
+const { Console } = require("console");
 
 
-const algorithm = "aes-256-cbc"; 
+const algorithm = "AES-256-CBC";
+const secret_key = "fd85b494-aaaa";
+const secret_iv = "smslt"
 
-// generate 16 bytes of random data
-const initVector = crypto.randomBytes(16);
-
-// secret key generate 32 bytes of random data
-const Securitykey = crypto.randomBytes(32);
-
+const secret = crypto.createHash('sha512').update(secret_key,'utf-8').digest('hex').substring(0,32);
+const iv = crypto.createHash('sha512').update(secret_iv,'utf-8').digest('hex').substring(0,16);
 
 
 //create and save a user
 exports.create = async(req,res) => {
+  
     try{
-    const result = await userSchema.validateAsync(req.body)
+    console.log(`The body of request is: ${Object.keys(req.body)}`);
+    const result = await userSchema.validateAsync(req.body);
+    console.log(req.body)
+    console.log("")
+    console.log("")
+    console.log(result)
+
     const user = {
         name:result.name,
         age:result.age,
@@ -33,24 +54,39 @@ exports.create = async(req,res) => {
     }
 
 // protected password
+console.log(`USER photo:${user.photo}`);
 const passwordTobeProtected  = user.pwd;
 
 // the cipher function
-const cipher = crypto.createCipheriv(algorithm, Securitykey, initVector);
+key = crypto.createCipheriv(algorithm, secret,iv);
+const encrypted_str = key.update(passwordTobeProtected, 'utf8', 'hex') + key.final('hex');
+const encrypted_data = Buffer.from(encrypted_str).toString('utf8');
+user.pwd=encrypted_data;
 
-// encrypt the message
-// input encoding
-// output encoding
-let encryptedData = cipher.update(passwordTobeProtected, "utf-8", "hex");
+const file = user.photo;
+console.log(req.body);
+console.log(`file name: ${file.name}`)
+const fileName = file.name;
+const size = file.data.length;
+const extension = path.extname(fileName);
 
-encryptedData += cipher.final("hex");
+const permittedExtensions = /png|jpg|jpeg/
 
-console.log("Encrypted password: " + encryptedData);
+if(!permittedExtensions.test(extension)){
+    throw "Unsupported File format"
+}
 
-user.pwd=encryptedData;
+if (size > 5000000) throw "File must be less than 5 MB"
 
 
-    User.create(user).then((data) => res.send(data))
+
+const md5 = file.md5;
+const URL = "/uploads/"+md5+extension;
+
+
+await util.promisify(file.mv)("./uploads" + URL);
+
+User.create(user).then((data) => res.send(data))
 
     }catch(error){
         
@@ -144,7 +180,6 @@ exports.deleteOne = (req,res) => {
             message:err.message||`There is an error while deleting the user with id: ${id}`
         })
     })
-
 }
 
 
@@ -164,18 +199,20 @@ exports.loginUser = async(req,res) => {
       ).then((data) => {
         if(data.length>0){
             // the decipher function
-            const encryptedpwd = data[0].pwd
-const decipher = crypto.createDecipheriv(algorithm, Securitykey, initVector);
-let decryptedData = decipher.update(encryptedpwd, "hex", "utf-8");
-decryptedData += decipher.final("utf8");
+            const receivedEncryptedpwd = data[0].pwd
+            const buff = Buffer.from(receivedEncryptedpwd,'utf8');
+            const encryptedpwd = buff.toString('utf-8');
+            
+const decryptor = crypto.createDecipheriv(algorithm,secret,iv);
+const decryptedData = decryptor.update(encryptedpwd,'hex','utf8') + decryptor.final('utf8')
 res.send(decryptedData)
-console.log("Decrypted message: " + decryptedData);
+
 if(decryptedData === pwd){
 res.send("Login successful")
 }else{
-    res.status(500).send("Invalid email/ password comination!")
+   res.status(500).send("Invalid email/ password comination!")
 
-}
+ }
         }else{
             res.send("No user found registered with the provided e-mail")
         }

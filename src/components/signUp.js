@@ -18,7 +18,6 @@ import validator from "validator";
       enteredEmail:"",
       enteredPassword:"",
       confirmPassword:"",
-      photo:"",
       successMessage:"",
       modalNeeded:false,
       nameError:"",
@@ -28,7 +27,9 @@ import validator from "validator";
       passwordError:"",
       enteredPasswordError:"",
       confirmPasswordError:"",
-      photoAdded:"",
+      photo:"",
+      photoName:"",
+      photoSize:"",
       isDisabled: false,
       nameObtained: false,
       ageObtained: false,
@@ -163,8 +164,14 @@ import validator from "validator";
       },()=>console.log(this.state.confirmPassword))
     }
 
+    handleFileUpload = (event) => {
+      this.setState({
+        photo:event.target.files["0"],
+      },() => console.log(this.state.photo))
+    }
 
-    handleNewUser = () => {
+    handleNewUser = (e) => {
+      e.preventDefault();
       this.validateFields(this.state.enteredName,
           this.state.enteredAge,
           this.state.enteredMobileNumber,
@@ -179,7 +186,11 @@ import validator from "validator";
         mobileNumber:this.state.enteredMobileNumber,
         eMail:this.state.enteredEmail,
         pwd:this.state.confirmPassword,
-
+        photo:this.state.photo
+      },{
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
       }).then((res) =>{
         console.log(res)
         if(res.status === 200){
@@ -201,7 +212,7 @@ import validator from "validator";
             <h1> Enter your details below to join us</h1>
             <Row justify="center">
                 <Col>
-                <Form
+                <Form method="post" encType="multipart/form-data"
         labelCol={{
           span: 16,
         }}
@@ -234,10 +245,10 @@ import validator from "validator";
           <p style={{color:"red",marginBottom:"0"}}>{this.state.confirmPasswordError}</p>
         </Form.Item>
         <Form.Item label="Photo">
-          <Input type="file" size="large"/>
+          <Input type="file" onChange={this.handleFileUpload} size="large"/>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" style={{marginRight:".3rem"}} onClick = {this.handleNewUser}>Submit</Button>
+          <Button type="submit" style={{marginRight:".3rem"}} onClick = {this.handleNewUser}>Submit</Button>
           <Link to = '/'><Button type='primary'>Back</Button></Link>
         </Form.Item>
        </Form>

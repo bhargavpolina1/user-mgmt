@@ -7,7 +7,7 @@ const userSchema = Joi.object({
     mobileNumber:Joi.number().min(1000000000).required(),
     eMail:Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net','in'] } }).required().lowercase(),
     pwd:Joi.string().pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)).required(),
-    photo:Joi.string(),
+    photo:Joi.any().optional(),
     makeAdmin:Joi.bool().optional().default(false)
 })
 
