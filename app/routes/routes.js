@@ -5,7 +5,7 @@ module.exports = (app) => {
     router.get("/",users.viewAll)
 
     //View a user
-    //router.get("/:id",users.viewOne)
+    router.get("/:id",users.viewOne)
     
     // Create a new user
     router.post("/", users.create);
@@ -17,7 +17,7 @@ module.exports = (app) => {
     router.delete('/:id',users.deleteOne)
 
     // login
-    router.get('/login',users.loginUser)
+    router.post('/login',users.loginUser)
     
     app.use('/api/users', router);
 

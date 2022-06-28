@@ -201,7 +201,9 @@ handleSwitch = (record) => {
           <Column title="Age" dataIndex="age" key="age" />
           <Column title="Mobile" dataIndex="mobileNumber" key="mobilenumber"/>
           <Column title="E-Mail" dataIndex="eMail" key="email"/>
-          <Column title="Photo" dataIndex="photo" key="photo"/>
+          <Column title="Photo" dataIndex="photo" key="photo" render={(record) => (
+            <img src = {record} style = {{height:"100px"}}/>
+          )}/>
           <Column title="Is Abmin?" dataIndex="makeAdmin" key="makeadmin"
           render = {(record)=><div> {console.log(record)} {record ? 'Yes':'No'}</div>}/>
            <Column

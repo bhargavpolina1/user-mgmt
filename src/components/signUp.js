@@ -164,10 +164,34 @@ import validator from "validator";
       },()=>console.log(this.state.confirmPassword))
     }
 
-    handleFileUpload = (event) => {
+    convertBase64 = (file) => {
+
+      return new Promise((resolve,reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(file);
+
+        fileReader.onload = () => {
+          resolve(fileReader.result)
+        }
+
+        fileReader.onerror = (error) => {
+          reject(error)
+        }
+      })
+
+    }
+
+    handleFileUpload = async(event) => {
+      console.log(event.target.files);
+      const file = event.target.files[0];
+      const base64=await this.convertBase64(file);
       this.setState({
-        photo:event.target.files["0"],
-      },() => console.log(this.state.photo))
+        photo:base64
+      },() =>console.log(this.state.photo))
+      
+      // this.setState({
+      //   photo:event.target.files["0"],
+      // },() => console.log(this.state.photo))
     }
 
     handleNewUser = (e) => {

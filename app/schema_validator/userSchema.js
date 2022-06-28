@@ -11,6 +11,12 @@ const userSchema = Joi.object({
     makeAdmin:Joi.bool().optional().default(false)
 })
 
+const loginSchema = Joi.object({
+    eMail:Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net','in'] } }).required().lowercase(),
+    pwd:Joi.string().pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)).required(),
+})
+
 module.exports = {
-    userSchema
+    userSchema,
+    loginSchema
 }

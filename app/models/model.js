@@ -22,7 +22,7 @@ module.exports = (sequelize, Sequelize) => {
       allowNull:false
     },
     photo:{
-      type: Sequelize.STRING,
+      type: Sequelize.TEXT('long'),
     },
     makeAdmin:{
       type: Sequelize.BOOLEAN,
