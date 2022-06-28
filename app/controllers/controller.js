@@ -22,15 +22,14 @@ const sequelize = require("sequelize")
 const {userSchema} = require("../schema_validator/userSchema")
 const crypto = require ("crypto");
 const { Console } = require("console");
+const { response } = require("express");
 
 
-const algorithm = "AES-256-CBC";
-const secret_key = "fd85b494-aaaa";
-const secret_iv = "smslt"
+const algorithm = "aes-256-cbc";
 
-const secret = crypto.createHash('sha512').update(secret_key,'utf-8').digest('hex').substring(0,32);
-const iv = crypto.createHash('sha512').update(secret_iv,'utf-8').digest('hex').substring(0,16);
 
+const iv = crypto.randomBytes(16).toString("hex").slice(0, 16);
+const secretKey = "12345678123456781234567812345678";
 
 //create and save a user
 exports.create = async(req,res) => {
@@ -58,10 +57,11 @@ console.log(`USER photo:${user.photo}`);
 const passwordTobeProtected  = user.pwd;
 
 // the cipher function
-key = crypto.createCipheriv(algorithm, secret,iv);
-const encrypted_str = key.update(passwordTobeProtected, 'utf8', 'hex') + key.final('hex');
-const encrypted_data = Buffer.from(encrypted_str).toString('utf8');
-user.pwd=encrypted_data;
+const encrypter = crypto.createCipheriv(algorithm, secretKey, iv);
+let encryptedMsg = encrypter.update(passwordTobeProtected, "utf8", "hex");
+encryptedMsg += encrypter.final("hex");
+user.pwd=encryptedMsg;
+console.log(encryptedMsg);
 
 const file = user.photo;
 console.log(req.body);
@@ -200,14 +200,13 @@ exports.loginUser = async(req,res) => {
         if(data.length>0){
             // the decipher function
             const receivedEncryptedpwd = data[0].pwd
-            const buff = Buffer.from(receivedEncryptedpwd,'utf8');
-            const encryptedpwd = buff.toString('utf-8');
-            
-const decryptor = crypto.createDecipheriv(algorithm,secret,iv);
-const decryptedData = decryptor.update(encryptedpwd,'hex','utf8') + decryptor.final('utf8')
-res.send(decryptedData)
+            const decrypter = crypto.createDecipheriv(algorithm, secretKey, iv);
+            decrypter.setAutoPadding(false);
+            let decryptedMsg = decrypter.update(receivedEncryptedpwd, "hex", "utf8");
+            decryptedMsg += decrypter.final("utf8");
+            console.log(decryptedMsg)
 
-if(decryptedData === pwd){
+if(decryptedMsg === pwd){
 res.send("Login successful")
 }else{
    res.status(500).send("Invalid email/ password comination!")
