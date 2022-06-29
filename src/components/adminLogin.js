@@ -146,7 +146,7 @@ handleDeleteCancel = () =>{
 
 
 
-handleSwitch = (record) => {
+handleSwitch = () => {
   this.setState({
     makeAdmin:!this.state.makeAdmin
   },() => console.log(`${this.state.makeAdmin} for ${this.state.id}`))
@@ -210,8 +210,8 @@ handleSwitch = (record) => {
              dataIndex:"eMail",
               key:"email",
               filters:[
-                {text:"aol", value: "@aol.com"},
-                {text:"gmail",value:"@gmail.com"}
+                {text:"AOL Mail", value: "@aol.com"},
+                {text:"Gmail",value:"@gmail.com"}
               ],
               onFilter:(value,record) => {
                 return record.eMail.endsWith(value)
@@ -222,7 +222,7 @@ handleSwitch = (record) => {
             dataIndex:"photo",
             key:"photo",
             render: (record) => (
-              <img src = {record} alt = "profile pic" style = {{height:"100px"}}/>
+              <img src = {record} alt = "" style = {{height:"100px"}}/>
             ),
             filters:[
               {text:"No photo",value: null},
@@ -259,7 +259,11 @@ handleSwitch = (record) => {
 
         return(
           <div>
+          <div style= {{display:"flex",justifyContent:"space-around"}}>
           <h1> User Details</h1>
+          <Link to = '/'><Button style= {{marginTop:"10px"}} type="primary">Logout</Button></Link>
+          </div>
+          
           <Modal
           title="Edit user details"
           visible={this.state.isModelNeedsToPopup}

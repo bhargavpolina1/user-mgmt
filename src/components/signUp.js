@@ -12,11 +12,11 @@ import validator from "validator";
   
   class SignUp extends Component {
     state = {
-      enteredName:"",
-      enteredAge:"",
+      name:"",
+      age:"",
       enteredMobileNumber:"",
-      enteredEmail:"",
-      enteredPassword:"",
+      eMail:"",
+      password:"",
       confirmPassword:"",
       successMessage:"",
       modalNeeded:false,
@@ -41,39 +41,39 @@ import validator from "validator";
     }
 
   validateFields = (
-    enteredName,
-    enteredAge,
-    enteredMobileNumber,
-    enteredEmail,
-    enteredPassword,
+    name,
+    age,
+    mobileNumber,
+    eMail,
+    password,
     confirmPassword
   ) => {
 
-    console.log("Validation initiated")
-    let validName = validator.isAlpha(enteredName);
-
+    console.log("Validation initiated");
     let stateToUpdate = {};
+
+    let validName = validator.isAlpha(name);
     if (!validName) {
       stateToUpdate.nameError =
         "*Enter a valid name. It should contain only alphabets";
     } else {
-      stateToUpdate.enteredName = enteredName;
+      stateToUpdate.name = name;
       stateToUpdate.nameObtained = true;
       stateToUpdate.nameError = "";
     }
 
 
-    let isValidAge = validator.isNumeric(enteredAge);
+    let isValidAge = validator.isNumeric(age);
     if (!isValidAge) {
       stateToUpdate.ageError =
         "*Enter a valid age. It should contain only numbers";
     } else {
-      stateToUpdate.age = enteredAge;
+      stateToUpdate.age = age;
       stateToUpdate.ageError = "";
       stateToUpdate.ageObtained = true;
     }
     let isValidMobileNumber = validator.isMobilePhone(
-        enteredMobileNumber,
+      mobileNumber,
         ["en-IN"]
       )
 
@@ -81,7 +81,7 @@ import validator from "validator";
         stateToUpdate.mobileNumberError =
           "*Enter a valid mobile number. It should contain 10 digits";
       } else {
-        stateToUpdate.enteredMobileNumber = enteredMobileNumber;
+        stateToUpdate.mobileNumber = mobileNumber;
         stateToUpdate.mobileNumberError = "";
         stateToUpdate.mobileNumberObtained = true;
       }
@@ -90,33 +90,33 @@ import validator from "validator";
         stateToUpdate.ageError =
           "*Enter a valid age. It should contain only numbers";
       } else {
-        stateToUpdate.age = enteredAge;
+        stateToUpdate.age = age;
         stateToUpdate.ageError = "";
         stateToUpdate.ageObtained = true;
       }
 
-    let isValidEmail = validator.isEmail(enteredEmail);
+    let isValidEmail = validator.isEmail(eMail);
     if (!isValidEmail) {
       stateToUpdate.eMailError = "*Enter a valid mail id";
     } else {
-      stateToUpdate.eMail = enteredEmail;
+      stateToUpdate.eMail = eMail;
       stateToUpdate.eMailError = "";
       stateToUpdate.eMailObtained = true;
     }
 
-    let isValidPassword = validator.isStrongPassword(enteredPassword);
+    let isValidPassword = validator.isStrongPassword(password);
     if (!isValidPassword) {
       stateToUpdate.passwordError = "*Entered password didn't meet requirement";
     } else {
-      stateToUpdate.enteredPassword = enteredPassword;
+      stateToUpdate.password = password;
       stateToUpdate.passwordError = "";
       stateToUpdate.passwordMetRules = true;
     }
 
     let didPasswordsMatch =
-      enteredPassword !== "" &&
+    password !== "" &&
       confirmPassword !== "" &&
-      enteredPassword === confirmPassword;
+      password === confirmPassword;
     if (!didPasswordsMatch) {
       stateToUpdate.confirmPasswordError =
         "*Passwords didn't match. Enter same passwords";
@@ -126,37 +126,37 @@ import validator from "validator";
       stateToUpdate.passwordsMatched = true;
     }
 
-    this.setState(stateToUpdate)
+    this.setState(stateToUpdate,() => console.log(this.state.name,this.state.age))
 
   }
 
     onNameChange =(event)=> {
       this.setState({
-        enteredName: event.target.value
-      },() => console.log(this.state.enteredName))
+        name: event.target.value
+      },() => console.log(this.state.name))
     }
     
     onAgeChange = (event)=> {
       this.setState({
-        enteredAge:event.target.value
-      },() => console.log(this.state.enteredAge))
+        age:event.target.value
+      },() => console.log(this.state.age))
     }
     
     onMobileChange = (event) => {
       this.setState({
-        enteredMobileNumber:event.target.value
-      },() => console.log(this.state.enteredMobileNumber))
+        mobileNumber:event.target.value
+      },() => console.log(this.state.mobileNumber))
     }
     
     onEMailChange = (event) => {
       this.setState({
-        enteredEmail:event.target.value
-      },() => console.log(this.state.enteredEmail))
+        eMail:event.target.value
+      },() => console.log(this.state.eMail))
     }
     onPasswordChange = (event) => {
       this.setState({
-        enteredPassword:event.target.value
-      },() => console.log(this.state.enteredPassword))
+        password:event.target.value
+      },() => console.log(this.state.password))
     }
     onConfirmPasswordChange = (event) => {
       this.setState({
@@ -188,33 +188,25 @@ import validator from "validator";
       this.setState({
         photo:base64
       },() =>console.log(this.state.photo))
-      
-      // this.setState({
-      //   photo:event.target.files["0"],
-      // },() => console.log(this.state.photo))
     }
 
     handleNewUser = (e) => {
       e.preventDefault();
-      this.validateFields(this.state.enteredName,
-          this.state.enteredAge,
-          this.state.enteredMobileNumber,
-          this.state.enteredEmail,
-          this.state.enteredPassword,
+      this.validateFields(this.state.name,
+          this.state.age,
+          this.state.mobileNumber,
+          this.state.eMail,
+          this.state.password,
           this.state.confirmPassword)
 
       if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordMetRules){
         axios.post('http://localhost:8080/api/users/',{
-        name:this.state.enteredName,
-        age:this.state.enteredAge,
-        mobileNumber:this.state.enteredMobileNumber,
-        eMail:this.state.enteredEmail,
+        name:this.state.name,
+        age:this.state.age,
+        mobileNumber:this.state.mobileNumber,
+        eMail:this.state.eMail,
         pwd:this.state.confirmPassword,
         photo:this.state.photo
-      },{
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
       }).then((res) =>{
         console.log(res)
         if(res.status === 200){
@@ -245,23 +237,23 @@ import validator from "validator";
         }}
         layout="vertical">
         <Form.Item label="Name" >
-          <Input value={this.state.enteredName} onChange={this.onNameChange} placeholder='Enter your name' size="large"/>
+          <Input value={this.state.name} onChange={this.onNameChange} placeholder='Enter your name' size="large"/>
           <p style={{color:"red",marginBottom:"0"}}>{this.state.nameError}</p>
         </Form.Item>
         <Form.Item label="Age">
-          <Input value={this.state.enteredAge} onChange={this.onAgeChange} placeholder='Enter your age' size="large"/>
+          <Input value={this.state.age} onChange={this.onAgeChange} placeholder='Enter your age' size="large"/>
           <p style={{color:"red",marginBottom:"0"}}>{this.state.ageError}</p>
         </Form.Item>    
         <Form.Item label="Mobile Number">
-          <Input value={this.state.enteredMobileNumber} onChange={this.onMobileChange} placeholder='Enter your mobile number' size="large"/>
+          <Input value={this.state.mobileNumber} onChange={this.onMobileChange} placeholder='Enter your mobile number' size="large"/>
           <p style={{color:"red",marginBottom:"0"}}>{this.state.mobileNumberError}</p>
         </Form.Item>
         <Form.Item label="E-Mail">
-          <Input value={this.state.enteredEmail} onChange={this.onEMailChange} type = "email" placeholder='Enter your e-mail' size="large"/>
+          <Input value={this.state.eMail} onChange={this.onEMailChange} type = "email" placeholder='Enter your e-mail' size="large"/>
           <p style={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
         </Form.Item>
         <Form.Item label="Password">
-          <Input value={this.state.enteredPassword} onChange={this.onPasswordChange} type = "password" placeholder='Enter your password' size="large"/>
+          <Input value={this.state.password} onChange={this.onPasswordChange} type = "password" placeholder='Enter your password' size="large"/>
           <p style={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
         </Form.Item>
         <Form.Item label="Re-enter Password">

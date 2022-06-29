@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import validator from "validator";
 import AdminLogin from './adminLogin';
+import UserLogin from './userLogin';
   
   class SignIn extends Component {
 
@@ -19,10 +20,13 @@ import AdminLogin from './adminLogin';
       successMessage:"",
       eMailError:"",
       passwordError:"",
+      errorMessage:"",
       emailValid:false,
       passwordValid:false,
       renderUsers:false,
-      isAdmin:false
+      isAdmin:false,
+      isNonAdminUser:false,
+      showDetails:true,
     }
 
     validateMailAndPwd = (enteredEmail,enteredPassword) => {
@@ -79,64 +83,66 @@ import AdminLogin from './adminLogin';
               successMessage:"User login successful",
               renderUsers:true,
               isAdmin:true,
+              showDetails:false
+              
             },() => console.log(this.state.renderUsers))
+          }else{
+            this.setState({
+              isNonAdminUser:true,
+              successMessage:"Normal user login successful",
+              renderUsers:false,
+              isAdmin:false,
+              errorMessage:"",
+              showDetails:false
+            },() => console.log(this.state.isNonAdminUser))
           }
-        }else{
-          this.setState({
-            successMessage:"",
-            renderUsers:false,
-            isAdmin:false
-
-
-          })
         }
-      }).catch((err) => console.log(err))
+      }).catch((err) => {
+        console.log(err.response.data)
+        this.setState({
+          errorMessage:err.response.data,
+          successMessage:"",
+          showDetails:true
+        })
+      })
       }
     }
     
   render(){
-    
-       {if(!this.state.renderUsers){
-        return (
-          <div>
-          <h1> Please enter your credentials</h1>
-          <Row justify='center'>
-              <Col>
-              <Form
-      labelCol={{
+    return(
+      this.state.showDetails? <div>
+      <h1> Please enter your credentials</h1>
+      <Row justify='center'>
+          <Col>
+          <Form
+        labelCol={{
         span: 16,
-      }}
+        }}
       wrapperCol={{
-        span: 24,
+      span: 24,
       }}
-      layout="vertical">
-      <Form.Item label="E-Mail">
-        <Input type="email" value={this.state.enteredEmail} onChange = {this.handleEmailChange} placeholder='Enter your e-mail' size="large"/>
-        <p style={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
-      </Form.Item>
-      <Form.Item>
-      <Form.Item label="Password">
-        <Input  placeholder='Enter your password' onChange={this.handlePasswordChange} value = {this.state.enteredPassword} type = "password" size="large"/>
-        <p style={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
-      </Form.Item>
-      </Form.Item>
-      <Form.Item>
-        <Button type="primary" onClick = {this.handleSign} style={{marginRight:".3rem"}}>Log in</Button>
-        <Link to = '/'><Button type='primary'>Back</Button></Link>
-      </Form.Item>
-      <p>{this.state.successMessage}</p>
-     </Form>
-    </Col>
-  </Row>
-      </div>
-        ) 
-        }else{
-          if(this.state.isAdmin){
-            return(<AdminLogin/>)
-          }else{
-            return(<h1>Welcome user</h1>)
-          }} 
-        } 
+  layout="vertical">
+  <Form.Item label="E-Mail">
+    <Input type="email" value={this.state.enteredEmail} onChange = {this.handleEmailChange} placeholder='Enter your e-mail' size="large"/>
+    <p style={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
+  </Form.Item>
+  <Form.Item>
+  <Form.Item label="Password">
+    <Input  placeholder='Enter your password' onChange={this.handlePasswordChange} value = {this.state.enteredPassword} type = "password" size="large"/>
+    <p style={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
+  </Form.Item>
+  </Form.Item>
+  <Form.Item>
+    <Button type="primary" onClick = {this.handleSign} style={{marginRight:".3rem"}}>Log in</Button>
+    <Link to = '/'><Button type='primary'>Back</Button></Link>
+  </Form.Item>
+  <p style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</p>
+  <p style={{color:"red",marginBottom:"0"}}>{this.state.errorMessage}</p>
+ </Form>
+</Col>
+</Row>
+</div>: this.state.isAdmin?<AdminLogin/>:<UserLogin/>
+  )
   }
   };
   

@@ -3,21 +3,13 @@ const User = db.users;
 const Op = db.Sequelize.Op;
 const express = require("express");
 const fileUpload = require("express-fileUpload");
-const path = require("path");
-const util = require("util");
+const { QueryTypes } = require('sequelize');
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.json({ limit: "10000kb", extended: true }));
+app.use(express.urlencoded({ limit: "10000kb", extended: true }));
 app.use(fileUpload());
 
-
-
-
-
-
-const { QueryTypes } = require('sequelize');
-const sequelize = require("sequelize")
 
 const {userSchema,loginSchema} = require("../schema_validator/userSchema")
 const crypto = require ("crypto");
@@ -31,12 +23,7 @@ const secretKey = "12345678123456781234567812345678";
 exports.create = async(req,res) => {
   
     try{
-    // console.log(`The body of request is: ${Object.keys(req.body)}`);
     const result = await userSchema.validateAsync(req.body);
-    // console.log(req.body)
-    // console.log("")
-    // console.log("")
-    // console.log(result)
 
     const user = {
         name:result.name,
@@ -49,7 +36,6 @@ exports.create = async(req,res) => {
     }
 
 // protected password
-// console.log(`USER photo:${user.photo}`);
 const passwordTobeProtected  = user.pwd.trim();
 
 // the cipher function
@@ -58,29 +44,6 @@ let encryptedMsg = encrypter.update(passwordTobeProtected, "utf8", "hex");
 encryptedMsg += encrypter.final("hex");
 user.pwd=encryptedMsg;
 console.log(encryptedMsg);
-
-// const file = user.photo;
-// console.log(req.body);
-// console.log(`file name: ${file.name}`)
-// const fileName = file.name;
-// const size = file.data.length;
-// const extension = path.extname(fileName);
-
-// const permittedExtensions = /png|jpg|jpeg/
-
-// if(!permittedExtensions.test(extension)){
-//     throw "Unsupported File format"
-// }
-
-// if (size > 5000000) throw "File must be less than 5 MB"
-
-
-
-// const md5 = file.md5;
-// const URL = "/uploads/"+md5+extension;
-
-
-// await util.promisify(file.mv)("./uploads" + URL);
 
 User.create(user).then((data) => res.send(data))
 
@@ -120,7 +83,7 @@ exports.viewOne = (req,res) => {
         }
     })
     .catch((err) => {
-        res.status(500).send(error)
+        res.status(500).send(err)
         res.status(500).send({
             message:err.message||"Error while retriving details with id: " + id
         })
@@ -137,7 +100,7 @@ exports.updateOne = (req,res) =>{
         where:{id:id}
     }).then((num) => {
         console.log(num)
-        if(num == 1){
+        if(num === 1){
             res.send(`User with id: ${id} updated successfully`)
         }else{
             res.status(404).send({
@@ -161,7 +124,7 @@ exports.deleteOne = (req,res) => {
     User.destroy({
         where:{id:id}
     }).then((num) => {
-        if (num == 1){
+        if (num === 1){
             res.send({
                 message:`user with id: ${id} deleted successfully`
             })
@@ -195,7 +158,7 @@ exports.loginUser = async(req,res) => {
 
 
     await db.sequelize.query(
-        'SELECT pwd,makeAdmin FROM user_mgmt.users WHERE eMail = :eMail',
+        'SELECT * FROM user_mgmt.users WHERE eMail = :eMail',
         {
           replacements: {eMail: userDetails.eMail},
           type: QueryTypes.SELECT
@@ -206,28 +169,24 @@ exports.loginUser = async(req,res) => {
             const Encryptedpwd = data[0].pwd
             console.log(Encryptedpwd);
             const decrypter = crypto.createDecipheriv("aes-256-cbc", secretKey, iv);
-            //decrypter.setAutoPadding(false);
             let decryptedMsg = decrypter.update(Encryptedpwd, "hex", "utf8");
             decryptedMsg += decrypter.final("utf8").trim();
 
             console.log(`Decrypted password: ${decryptedMsg}`)
             
             console.log(decryptedMsg.length, userDetails.pwd.length)
-            // reqStreamOfpassword = decryptedMsg.slice(0,userDetails.pwd.length);
-            // console.log(`Decrypted password after trim: ${reqStreamOfpassword}`);
+
             console.log(`Entered pwd: ${userDetails.pwd}`);
             console.log(typeof decryptedMsg);
             console.log(typeof userDetails.pwd);
-            // console.log(reqStreamOfpassword.length === userDetails.pwd.length)
-            // console.log(reqStreamOfpassword === userDetails.pwd)
-            
+
             if(decryptedMsg === userDetails.pwd){
             res.send(data)
             }else{
             res.status(500).send("Invalid email/ password comination!")
             }
                     }else{
-                        res.status(404).send("No user found registered with the provided e-mail")
+                        res.status(404).send("No user registered with the provided e-mail")
                     }
                 }).catch((err) => res.status(500).send(err))
             }
