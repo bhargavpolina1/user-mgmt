@@ -135,9 +135,7 @@ import AdminLogin from './adminLogin';
             return(<AdminLogin/>)
           }else{
             return(<h1>Welcome user</h1>)
-          }}
-          
-          
+          }} 
         } 
   }
   };

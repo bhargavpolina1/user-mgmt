@@ -4,9 +4,9 @@ import axios from "axios";
 
 import { Table,Switch,Space,Button,Modal,Input } from 'antd';
 import { Link } from "react-router-dom";
-const { Column } = Table;
 
 class AdminLogin extends Component {
+
 
   state = {
     isDataFetched:false,
@@ -150,9 +150,6 @@ handleSwitch = (record) => {
   this.setState({
     makeAdmin:!this.state.makeAdmin
   },() => console.log(`${this.state.makeAdmin} for ${this.state.id}`))
- // axios.put(`http://localhost:8080/api/users/${id}`,{
-
- // })
 }
     render(){
       if (this.state.isDataFetched){
@@ -168,6 +165,98 @@ handleSwitch = (record) => {
             makeAdmin:eachUser.makeAdmin
           }
         })
+
+         const columns = [
+          {
+            title:"Name",
+             dataIndex:"name",
+              key:"name",
+              filters:[
+                {text:"Starting with a",value:"a"},
+                {text:"starting with v", value:"v"}
+              ],
+              onFilter:(value,record)=> {
+                return record.name.startsWith(value)
+              }
+          },
+          {
+            title:"Age",
+             dataIndex:"age",
+              key:"Age",
+              filters:[
+                {text:"<= 30 Years",value: 30},
+              ],
+              onFilter:(value,record) => {
+                return record.age <= value
+              }
+          },
+          {
+            title:"Mobile",
+             dataIndex:"mobileNumber",
+              key:"mobileNumber",
+              filters:[
+                {text:"Starting with 9",value:"9"},
+                {text:"starting with 8", value:"8"}
+              ],
+              onFilter:(value,record)=> {
+                console.log(typeof record.mobileNumber)
+                const strNumber = record.mobileNumber.toString();
+
+                return strNumber[0] === value;
+              }
+          },
+          {
+            title:"E-Mail",
+             dataIndex:"eMail",
+              key:"email",
+              filters:[
+                {text:"aol", value: "@aol.com"},
+                {text:"gmail",value:"@gmail.com"}
+              ],
+              onFilter:(value,record) => {
+                return record.eMail.endsWith(value)
+              }
+          },
+          {
+            title:"Photo",
+            dataIndex:"photo",
+            key:"photo",
+            render: (record) => (
+              <img src = {record} alt = "profile pic" style = {{height:"100px"}}/>
+            ),
+            filters:[
+              {text:"No photo",value: null},
+            ],
+            onFilter:(value,record) => {
+              return record.photo === value
+            }
+          },
+          {
+            title:"Is Abmin?",
+            dataIndex:"makeAdmin",
+            key:"makeadmin",
+            render: (record)=><div> {record ? 'Yes':'No'}</div>,
+            filters:[
+              {text:"Yes",value:true},
+              {text:"No",value:false}
+            ],
+            onFilter:(value,record) => {
+              return record.makeAdmin === value
+            }
+          },
+          {
+            title:"Action",
+                  key: "action",
+                  id: "id",
+                  render: (record) => (
+                    <Space size="middle">
+                        <Button type = "primary" onClick={() => this.handleEdit(record)}>Edit</Button>
+                        <Button type = "primary" onClick={() => this.showDeleteItemModel(record)}>Delete</Button>
+                    </Space>
+                  )
+                }
+        ];
+
         return(
           <div>
           <h1> User Details</h1>
@@ -196,27 +285,7 @@ handleSwitch = (record) => {
           onOk={this.handleDeleteOk}
           onCancel={this.handleDeleteCancel}>
       </Modal>
-          <Table dataSource={data} rowKey={record => record.id}>
-          <Column title="Name" dataIndex="name" key="name"/>
-          <Column title="Age" dataIndex="age" key="age" />
-          <Column title="Mobile" dataIndex="mobileNumber" key="mobilenumber"/>
-          <Column title="E-Mail" dataIndex="eMail" key="email"/>
-          <Column title="Photo" dataIndex="photo" key="photo" render={(record) => (
-            <img src = {record} style = {{height:"100px"}}/>
-          )}/>
-          <Column title="Is Abmin?" dataIndex="makeAdmin" key="makeadmin"
-          render = {(record)=><div> {console.log(record)} {record ? 'Yes':'No'}</div>}/>
-           <Column
-            title="Action"
-            key="action"
-            id = "id"
-            render={(record) => (
-              <Space size="middle">
-                  <Button type = "primary" onClick={() => this.handleEdit(record)}>Edit</Button>
-                  <Button type = "primary" onClick={() => this.showDeleteItemModel(record)}>Delete</Button>
-              </Space>
-            )}
-          />
+          <Table columns = {columns} dataSource={data} rowKey={record => record.id}>
         </Table>
         <div> 
           <Link to = "/admin/adduser">
