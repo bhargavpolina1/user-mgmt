@@ -1,12 +1,17 @@
 import React, { Component } from "react";
 import axios from "axios";
 
-
+import Highlighter from 'react-highlight-words';
+import { SearchOutlined } from '@ant-design/icons';
 import { Table,Switch,Space,Button,Modal,Input } from 'antd';
 import { Link } from "react-router-dom";
 
 class AdminLogin extends Component {
 
+  constructor(props) {
+    super(props);
+    this.myRef = React.createRef();
+  }
 
   state = {
     isDataFetched:false,
@@ -20,7 +25,27 @@ class AdminLogin extends Component {
     mobileNumber:"",
     eMail:"",
     makeAdmin:false,
+    searchedText:"",
+    searchedColumn:"",
+    searchInput: "",
+    selectedKeys:"",
   }
+ 
+   handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    this.setState({
+      searchedText:selectedKeys[0],
+      searchedColumn:dataIndex
+    })
+  }
+
+  handleReset = (clearFilters) => {
+    clearFilters(); 
+    this.setState({
+      searchedText:""
+    });
+  };
+
 
   componentDidMount(){
     console.log("Mount initiated")
@@ -154,7 +179,6 @@ handleSwitch = () => {
     render(){
       if (this.state.isDataFetched){
         const data = this.state.dataFetched.map((eachUser) => {
-          console.log(eachUser.makeAdmin)
           return {
             id:eachUser.id,
             name:eachUser.name,
@@ -164,6 +188,98 @@ handleSwitch = () => {
             photo:eachUser.photo,
             makeAdmin:eachUser.makeAdmin
           }
+        })
+        const getColumnSearchProps = (dataIndex) => ({
+          filterDropdown: ({selectedKeys, confirm, clearFilters }) => (
+            <div
+              style={{
+                padding: 8,
+              }}
+            >
+              <Input
+                myRef={this.state.searchInput}
+                placeholder={`Search ${dataIndex}`}
+                value={selectedKeys[0]}
+                onChange={(e) => 
+                  {
+                    this.setState({
+                      selectedKeys: e.target.value ? [e.target.value] : []
+                    })
+                  }
+                }
+                onPressEnter={() => this.handleSearch(this.state.selectedKeys, confirm, dataIndex)}
+                style={{
+                  marginBottom: 8,
+                  display: 'block',
+                }}
+              />
+              <Space>
+                <Button
+                  type="primary"
+                  onClick={() => this.handleSearch(this.state.selectedKeys, confirm, dataIndex)}
+                  icon={<SearchOutlined />}
+                  size="small"
+                  style={{
+                    width: 90,
+                  }}
+                >
+                  Search
+                </Button>
+                <Button
+                  onClick={() => this.clearFilters && this.handleReset(this.clearFilters)}
+                  size="small"
+                  style={{
+                    width: 90,
+                  }}
+                >
+                  Reset
+                </Button>
+                <Button
+                  type="link"
+                  size="small"
+                  onClick={() => {
+                    confirm({
+                      closeDropdown: false,
+                    });
+                    this.setState({
+                      searchedText:selectedKeys[0],
+                      searchedColumn:dataIndex
+                    })
+                  }}
+                >
+                  Filter
+                </Button>
+              </Space>
+            </div>
+          ),
+          filterIcon: (filtered) => (
+            <SearchOutlined
+              style={{
+                color: filtered ? '#1890ff' : undefined,
+              }}
+            />
+          ),
+          onFilter: (value, record) =>
+            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+          onFilterDropdownVisibleChange: (visible) => {
+            if (visible) {
+              setTimeout(() => this.state.searchInput.current?.select(), 100);
+            }
+          },
+          render: (text) =>
+            this.state.searchedColumn === dataIndex ? (
+              <Highlighter
+                highlightStyle={{
+                  backgroundColor: '#ffc069',
+                  padding: 0,
+                }}
+                searchWords={[this.state.searchText]}
+                autoEscape
+                textToHighlight={text ? text.toString() : ''}
+              />
+            ) : (
+              text
+            ),
         })
 
          const columns = [
@@ -177,7 +293,8 @@ handleSwitch = () => {
               ],
               onFilter:(value,record)=> {
                 return record.name.startsWith(value)
-              }
+              },
+              ...getColumnSearchProps('name')
           },
           {
             title:"Age",
