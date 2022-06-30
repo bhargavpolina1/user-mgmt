@@ -21,12 +21,17 @@ class UserLogin extends Component {
 
         }).catch((err) => console.log(err))
     }
+
+    handleLogout = () => {
+        window.sessionStorage.clear()
+
+    }
     render(){
         return(
         <div>
             <div style= {{display:"flex",justifyContent:"space-around"}}>
                 <h1>Welcome User</h1>
-                <Link to = '/'><Button style= {{marginTop:"10px"}} type="primary">Logout</Button></Link>
+                <Link to = '/'><Button style= {{marginTop:"10px"}} onClick = {this.handleLogout} type="primary">Logout</Button></Link>
             </div>
             {this.state.isDataFetched?<div style={{display:"flex",flexDirection:"column",justifyContent:"row",width:"100vw"}}>
                 <h1>Latest News</h1>

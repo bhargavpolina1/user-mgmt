@@ -29,6 +29,24 @@ import UserLogin from './userLogin';
       showDetails:true,
     }
 
+     
+
+     componentDidMount(){
+      if(window.sessionStorage.getItem('eMail') && window.sessionStorage.getItem('pwd')){
+        const availableEmail = window.sessionStorage.getItem('eMail')
+        const availablePwd = window.sessionStorage.getItem('pwd')
+        this.setState({
+          enteredEmail:availableEmail,
+          enteredPassword:availablePwd,
+          emailValid:true,
+          passwordValid:true,
+          eMailError:"",
+          passwordError:""
+        },() => console.log(this.state.enteredEmail,this.state.enteredPassword))
+      }
+ 
+     }
+
     validateMailAndPwd = (enteredEmail,enteredPassword) => {
       
       
@@ -67,17 +85,19 @@ import UserLogin from './userLogin';
       },() => console.log(this.state.enteredPassword))
     }
 
-    handleSign = () => {
+    handleSign = async() => {
       console.log("Login clicked")
 
       this.validateMailAndPwd(this.state.enteredEmail,this.state.enteredPassword)
 
       if(this.state.emailValid && this.state.passwordValid){
-        axios.post('http://localhost:8080/api/users/login',{
+        await axios.post('http://localhost:8080/api/users/login',{
         eMail:this.state.enteredEmail,
         pwd:this.state.enteredPassword,
       }).then((res) =>{
         if(res.status === 200){
+          window.sessionStorage.setItem("eMail",this.state.enteredEmail);
+          window.sessionStorage.setItem("pwd",this.state.enteredPassword)
           if(res.data[0].makeAdmin === 1){
             this.setState({
               successMessage:"User login successful",

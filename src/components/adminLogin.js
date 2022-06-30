@@ -176,6 +176,11 @@ handleSwitch = () => {
     makeAdmin:!this.state.makeAdmin
   },() => console.log(`${this.state.makeAdmin} for ${this.state.id}`))
 }
+
+handleLogout = () => {
+  window.sessionStorage.clear()
+
+}
     render(){
       if (this.state.isDataFetched){
         const data = this.state.dataFetched.map((eachUser) => {
@@ -378,7 +383,7 @@ handleSwitch = () => {
           <div>
           <div style= {{display:"flex",justifyContent:"space-around"}}>
           <h1> User Details</h1>
-          <Link to = '/'><Button style= {{marginTop:"10px"}} type="primary">Logout</Button></Link>
+          <Link to = '/'><Button onClick = {this.handleLogout} style= {{marginTop:"10px"}} type="primary">Logout</Button></Link>
           </div>
           
           <Modal

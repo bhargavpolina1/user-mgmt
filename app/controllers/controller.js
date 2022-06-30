@@ -108,14 +108,10 @@ exports.updateOne = async(req,res) =>{
         if(num == 1){
             return res.send(`User with id: ${id} updated successfully`)
         }else{
-            return res.status(404).send({
-                message:`No user exists with the given id:${id} to update`
-            })
+            return res.status(404).send(`No user exists with the given id:${id} to update`)
         }
     }).catch((err) => {
-            return res.status(500).send({
-                message:err.message || "Error while updating user with id: " +id
-            })
+            return res.status(500).send(err.message || "Error while updating user with id: " +id)
     })
 
 }
@@ -154,7 +150,6 @@ exports.loginUser = async(req,res) => {
     const userDetails = {
         eMail: result.eMail,
         pwd :result.pwd,
-
     }
         
         console.log(`Entered mail from API:${userDetails.eMail}`)
@@ -186,4 +181,4 @@ exports.loginUser = async(req,res) => {
                 }).catch((err) =>{
                     console.log(err)
                     return res.status(500).send(err)})
-                } 
+                }
