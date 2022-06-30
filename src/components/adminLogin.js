@@ -10,7 +10,7 @@ class AdminLogin extends Component {
 
   constructor(props) {
     super(props);
-    this.myRef = React.createRef();
+    this.myref = React.createRef();
   }
 
   state = {
@@ -197,7 +197,7 @@ handleSwitch = () => {
               }}
             >
               <Input
-                myRef={this.state.searchInput}
+                myref={this.state.searchInput}
                 placeholder={`Search ${dataIndex}`}
                 value={selectedKeys[0]}
                 onChange={(e) => 
@@ -396,7 +396,7 @@ handleSwitch = () => {
   <Input value = {this.state.mobileNumber} onChange = {this.onMobileChange}/>
   <label>email</label>
   <Input value = {this.state.eMail} onChange = {this.oneEMailChange}/>
-  <lable>Admin: </lable>
+  <label>Admin: </label>
   <label>No </label><Switch checked = {this.state.makeAdmin} onChange = {this.handleSwitch}/><label> Yes</label>
 </Modal>
       <Modal
@@ -415,7 +415,7 @@ handleSwitch = () => {
         </div>
       </div>)
       }else{
-        return(<h1>Data Fetching</h1>)
+        return(<h1>Fetching userdata</h1>)
       }
     }
 }

@@ -40,6 +40,7 @@ import validator from "validator";
       eMailObtained: false,
       passwordMetRules: false,
       passwordsMatched: false,
+      errorMessage:""
 
     }
 
@@ -166,7 +167,31 @@ import validator from "validator";
         confirmPassword:event.target.value
       },()=>console.log(this.state.confirmPassword))
     }
+    convertBase64 = (file) => {
 
+      return new Promise((resolve,reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(file);
+
+        fileReader.onload = () => {
+          resolve(fileReader.result)
+        }
+
+        fileReader.onerror = (error) => {
+          reject(error)
+        }
+      })
+
+    }
+
+    handleFileUpload = async(event) => {
+      console.log(event.target.files);
+      const file = event.target.files[0];
+      const base64=await this.convertBase64(file);
+      this.setState({
+        photo:base64
+      },() =>console.log(this.state.photo))
+    }
     handleMultipleUSerAddition = () => {
       console.log("Trying to add multiple");
       this.setState({
@@ -202,19 +227,29 @@ import validator from "validator";
         mobileNumber:this.state.enteredMobileNumber,
         eMail:this.state.enteredEmail,
         pwd:this.state.confirmPassword,
+        photo:this.state.photo
 
       }).then((res) =>{
         console.log(res)
         if(res.status === 200){
           this.setState({
-            successMessage:"User added successfully"
+            successMessage:"User added successfully",
+            errorMessage:""
           })
         }else{
           this.setState({
-            successMessage:"Error while adding user"
+            errorMessage:"Error while adding user",
+            successMessage:""
           })
         }
-      }).catch((err) => console.log(err))
+      }).catch((err) => {
+        console.log(err)
+        this.setState({
+          successMessage:"",
+          errorMessage:err.response.data.errorMessage
+
+        })
+      })
 
       }
     }
@@ -235,6 +270,7 @@ import validator from "validator";
             <Button type='primary' onClick = {this.handleMultipleUSerAddition}>Add bulk users</Button>
             <Row justify="center">
                 <Col>
+                <div>
                 <Form
         labelCol={{
           span: 16,
@@ -243,32 +279,50 @@ import validator from "validator";
           span: 24,
         }}
         layout="vertical">
-        <Form.Item label="Name" >
-          <Input value = {this.state.enteredName} onChange = {this.onNameChange} placeholder='Enter the name' size="large"/>
+        <div style = {{display:"flex"}}>
+          <div style = {{margin:"10px",width:"30vw"}}>
+          <Form.Item label="Name" >
+          <Input value = {this.state.enteredName} onChange = {this.onNameChange} placeholder='Enter the name' size="small"/>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.nameError}</p>
         </Form.Item>
-        <Form.Item label="Age">
-          <Input type = "number" value = {this.state.enteredAge} onChange = {this.onAgeChange} placeholder='Enter the age' size="large"/>
+          </div>
+          <div style = {{margin:"10px",width:"30vw"}}>
+          <Form.Item label="Age">
+          <Input type = "number" value = {this.state.enteredAge} onChange = {this.onAgeChange} placeholder='Enter the age' size="small"/>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.ageError}</p>
-        </Form.Item>      
-        <Form.Item label="Mobile Number">
-          <Input type = "number" value = {this.state.enteredMobileNumber} onChange = {this.onMobileChange} placeholder="Enter the mobile number" size="large"/>
+          </Form.Item>      
+          </div>  
+        </div>
+        <div style = {{display:"flex"}}>
+          <div style = {{margin:"10px",width:"30vw"}}>
+          <Form.Item label="Mobile Number">
+          <Input type = "number" value = {this.state.enteredMobileNumber} onChange = {this.onMobileChange} placeholder="Enter the mobile number" size="small"/>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.mobileNumberError}</p>
         </Form.Item>
-        <Form.Item label="Email">
-          <Input placeholder='Enter the e-mail' value = {this.state.enteredEmail} onChange = {this.onEMailChange} type="email" size="large"/>
+          </div>
+          <div style = {{margin:"10px",width:"30vw"}}>
+          <Form.Item label="Email">
+          <Input placeholder='Enter the e-mail' value = {this.state.enteredEmail} onChange = {this.onEMailChange} type="email" size="small"/>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
-        </Form.Item>
-        <Form.Item label="Password">
-          <Input type = "password" value = {this.state.enteredPassword} onChange = {this.onPasswordChange} placeholder='Enter the password' size="large"/>
+          </Form.Item>
+          </div>
+        </div>
+        <div style = {{display:"flex"}}>
+          <div style = {{margin:"10px",width:"30vw"}}>
+          <Form.Item label="Password">
+          <Input type = "password" value = {this.state.enteredPassword} onChange = {this.onPasswordChange} placeholder='Enter the password' size="small"/>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
         </Form.Item>
-        <Form.Item label="Re-enter Password">
-          <Input type = "password" value = {this.state.confirmPassword} onChange = {this.onConfirmPasswordChange} placeholder='Re-enter the password' size="large"/>
+          </div>
+          <div style = {{margin:"10px",width:"30vw"}}>
+          <Form.Item label="Re-enter Password">
+          <Input type = "password" value = {this.state.confirmPassword} onChange = {this.onConfirmPasswordChange} placeholder='Re-enter the password' size="small"/>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.confirmPasswordError}</p>
         </Form.Item>
-        <Form.Item label="Photo">
-          <Input type="file" size="large"/>
+          </div>
+        </div>
+        <Form.Item label="Photo" style = {{margin:"10px"}}>
+          <Input type="file" onChange={this.handleFileUpload} size="medium"/>
         </Form.Item>
         <Form.Item>
           <Button type="primary" onClick = {this.handleNewUser} style = {{marginRight:"0.3rem"}}>Submit</Button>
@@ -276,8 +330,11 @@ import validator from "validator";
           <Button type = "primary">Back</Button>
           </Link>
         </Form.Item>
-       </Form>
+      </Form>
+    </div>
+                
        <p>{this.state.successMessage}</p>
+       <p>{this.state.errorMessage}</p>
       </Col>
     </Row>
         </div>

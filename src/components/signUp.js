@@ -14,7 +14,7 @@ import validator from "validator";
     state = {
       name:"",
       age:"",
-      enteredMobileNumber:"",
+      mobileNumber:"",
       eMail:"",
       password:"",
       confirmPassword:"",
@@ -74,8 +74,8 @@ import validator from "validator";
     }
     let isValidMobileNumber = validator.isMobilePhone(
       mobileNumber,
-        ["en-IN"]
-      )
+      ["en-IN"]
+    )
 
       if (!isValidMobileNumber) {
         stateToUpdate.mobileNumberError =
@@ -215,7 +215,7 @@ import validator from "validator";
           })
         }else{
           this.setState({
-            successMessage:"Error while adding user"
+            successMessage:""
           })
         }
       }).catch((err) => console.log(err))
@@ -236,38 +236,59 @@ import validator from "validator";
           span: 24,
         }}
         layout="vertical">
-        <Form.Item label="Name" >
-          <Input value={this.state.name} onChange={this.onNameChange} placeholder='Enter your name' size="large"/>
-          <p style={{color:"red",marginBottom:"0"}}>{this.state.nameError}</p>
-        </Form.Item>
-        <Form.Item label="Age">
-          <Input value={this.state.age} onChange={this.onAgeChange} placeholder='Enter your age' size="large"/>
+          <div>
+          <div style = {{display:"flex"}}>
+            <div style = {{margin:"10px",width:"30vw"}}>
+              <Form.Item label="Name">
+                <Input value={this.state.name} onChange={this.onNameChange} placeholder='Enter your name' size="small"/>
+                <p style={{color:"red",marginBottom:"0"}}>{this.state.nameError}</p>
+              </Form.Item>
+            </div>
+            <div style = {{margin:"10px",width:"30vw"}}>
+            <Form.Item label="Age">
+          <Input value={this.state.age} onChange={this.onAgeChange} placeholder='Enter your age' size="small"/>
           <p style={{color:"red",marginBottom:"0"}}>{this.state.ageError}</p>
-        </Form.Item>    
-        <Form.Item label="Mobile Number">
-          <Input value={this.state.mobileNumber} onChange={this.onMobileChange} placeholder='Enter your mobile number' size="large"/>
-          <p style={{color:"red",marginBottom:"0"}}>{this.state.mobileNumberError}</p>
-        </Form.Item>
-        <Form.Item label="E-Mail">
-          <Input value={this.state.eMail} onChange={this.onEMailChange} type = "email" placeholder='Enter your e-mail' size="large"/>
-          <p style={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
-        </Form.Item>
-        <Form.Item label="Password">
-          <Input value={this.state.password} onChange={this.onPasswordChange} type = "password" placeholder='Enter your password' size="large"/>
+        </Form.Item> 
+            </div>
+          </div>  
+          <div style = {{display:"flex"}}>
+            <div style = {{margin:"10px",width:"30vw"}}>
+            <Form.Item label="Mobile Number">
+            <Input value={this.state.mobileNumber} onChange={this.onMobileChange} placeholder='Enter your mobile number' size="small"/>
+            <p style={{color:"red",marginBottom:"0"}}>{this.state.mobileNumberError}</p>
+            </Form.Item>
+            </div>
+            <div style = {{margin:"10px",width:"30vw"}}>
+            <Form.Item label="E-Mail">
+            <Input value={this.state.eMail} onChange={this.onEMailChange} type = "email" placeholder='Enter your e-mail' size="small"/>
+            <p style={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
+             </Form.Item>
+            </div>
+            </div>
+            <div style = {{display:"flex"}}>
+            <div style = {{margin:"10px",width:"30vw"}}>
+            <Form.Item label="Password">
+          <Input value={this.state.password} onChange={this.onPasswordChange} type = "password" placeholder='Enter your password' size="small"/>
           <p style={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
         </Form.Item>
-        <Form.Item label="Re-enter Password">
-          <Input value={this.state.confirmPassword} onChange={this.onConfirmPasswordChange} type = "password" placeholder='Re-enter your password' size="large"/>
+            </div>
+            <div style = {{margin:"10px",width:"30vw"}}>
+            <Form.Item label="Re-enter Password">
+          <Input value={this.state.confirmPassword} onChange={this.onConfirmPasswordChange} type = "password" placeholder='Re-enter your password' size="small"/>
           <p style={{color:"red",marginBottom:"0"}}>{this.state.confirmPasswordError}</p>
         </Form.Item>
+            </div>
+            </div>
+          </div>
         <Form.Item label="Photo">
-          <Input type="file" onChange={this.handleFileUpload} size="large"/>
+          <Input type="file" onChange={this.handleFileUpload} size="medium"/>
         </Form.Item>
         <Form.Item>
           <Button type="submit" style={{marginRight:".3rem"}} onClick = {this.handleNewUser}>Submit</Button>
           <Link to = '/'><Button type='primary'>Back</Button></Link>
         </Form.Item>
        </Form>
+       <p>{this.state.successMessage}</p>
       </Col>
     </Row>
         </div>

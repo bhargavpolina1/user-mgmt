@@ -11,12 +11,10 @@ app.use(express.urlencoded({ limit: "10000kb", extended: true }));
 app.use(fileUpload());
 
 
-const {userSchema,loginSchema} = require("../schema_validator/userSchema")
+const {userSchema,loginSchema,editUserSchema} = require("../schema_validator/userSchema")
 const crypto = require ("crypto");
 
-const iv = "1234567812345678";
 
-//crypto.randomBytes(16).toString("hex").slice(0, 16);
 const secretKey = "12345678123456781234567812345678";
 
 //create and save a user
@@ -38,19 +36,15 @@ exports.create = async(req,res) => {
 // protected password
 const passwordTobeProtected  = user.pwd.trim();
 
-// the cipher function
-const encrypter = crypto.createCipheriv("aes-256-cbc", secretKey, iv);
-let encryptedMsg = encrypter.update(passwordTobeProtected, "utf8", "hex");
-encryptedMsg += encrypter.final("hex");
-user.pwd=encryptedMsg;
-console.log(encryptedMsg);
+const hashedPassword = crypto.createHmac('sha256',secretKey).update(passwordTobeProtected).digest('hex');
+user.pwd=hashedPassword;
+console.log(hashedPassword);
 
 User.create(user).then((data) => res.send(data))
 
     }catch(error){
         
-            res.status(500).send({message:error.message|| "Some error occured while creating user"})
-
+        return res.status(500).send({message:error.message|| "Some error occured while creating user"})
     }   
 }
 
@@ -62,7 +56,7 @@ exports.viewAll = (req,res) => {
     
 
     User.findAll({where:condition}).then((data) => res.send(data)).catch((err) => {
-        res.send({
+        return res.send({
             message:err.message|| "Some error occured while retrieving users"
         })
     })
@@ -77,14 +71,13 @@ exports.viewOne = (req,res) => {
     User.findByPk(id)
     .then((data)=> {
         if(data !== null){
-            res.send(data)
+            return res.send(data)
         }else{
-            res.status(404).send({message:`No user exists with the given id:${id} to view`})
+            return res.status(404).send({message:`No user exists with the given id:${id} to view`})
         }
     })
     .catch((err) => {
-        res.status(500).send(err)
-        res.status(500).send({
+        return res.status(500).send({
             message:err.message||"Error while retriving details with id: " + id
         })
     })
@@ -93,22 +86,34 @@ exports.viewOne = (req,res) => {
 
 //Edit a user using ID
 
-exports.updateOne = (req,res) =>{
+exports.updateOne = async(req,res) =>{
+    const result = await editUserSchema.validateAsync(req.body);
+
+    const user = {
+        name:result.name,
+        age:result.age,
+        mobileNumber:result.mobileNumber,
+        eMail:result.eMail,
+        makeAdmin: result.makeAdmin,
+    }
+
+    console.log(user)
+
+    
     const id = req.params.id;
 
-    User.update(req.body,{
+    User.update(user,{
         where:{id:id}
     }).then((num) => {
-        console.log(num)
-        if(num === 1){
-            res.send(`User with id: ${id} updated successfully`)
+        if(num == 1){
+            return res.send(`User with id: ${id} updated successfully`)
         }else{
-            res.status(404).send({
+            return res.status(404).send({
                 message:`No user exists with the given id:${id} to update`
             })
         }
     }).catch((err) => {
-            res.status(500).send({
+            return res.status(500).send({
                 message:err.message || "Error while updating user with id: " +id
             })
     })
@@ -124,18 +129,18 @@ exports.deleteOne = (req,res) => {
     User.destroy({
         where:{id:id}
     }).then((num) => {
-        if (num === 1){
-            res.send({
+        if (num == 1){
+            return res.send({
                 message:`user with id: ${id} deleted successfully`
             })
 
         }else{
-            res.status(404).send({
+            return res.status(404).send({
                 message:`No user exists with the given id:${id} to delete`
             })
         }
     }).catch((err) => {
-        res.status(500).send({
+        return res.status(500).send({
             message:err.message||`There is an error while deleting the user with id: ${id}`
         })
     })
@@ -165,28 +170,20 @@ exports.loginUser = async(req,res) => {
         }
       ).then((data) => {
         if(data.length>0){
-            // the decipher function
-            const Encryptedpwd = data[0].pwd
-            console.log(Encryptedpwd);
-            const decrypter = crypto.createDecipheriv("aes-256-cbc", secretKey, iv);
-            let decryptedMsg = decrypter.update(Encryptedpwd, "hex", "utf8");
-            decryptedMsg += decrypter.final("utf8").trim();
 
-            console.log(`Decrypted password: ${decryptedMsg}`)
-            
-            console.log(decryptedMsg.length, userDetails.pwd.length)
+            const hashedPwdFromServer = data[0].pwd
+            const hashedPassword = crypto.createHmac('sha256',secretKey).update(userDetails.pwd).digest('hex');
 
-            console.log(`Entered pwd: ${userDetails.pwd}`);
-            console.log(typeof decryptedMsg);
-            console.log(typeof userDetails.pwd);
-
-            if(decryptedMsg === userDetails.pwd){
-            res.send(data)
+            if(hashedPwdFromServer === hashedPassword){
+            console.log(data)
+            return res.send(data)
             }else{
-            res.status(500).send("Invalid email/ password comination!")
+            return res.status(500).send("Invalid email/ password comination!")
             }
                     }else{
-                        res.status(404).send("No user registered with the provided e-mail")
+                        return res.status(404).send("No user registered with the provided e-mail")
                     }
-                }).catch((err) => res.status(500).send(err))
-            }
+                }).catch((err) =>{
+                    console.log(err)
+                    return res.status(500).send(err)})
+                } 
