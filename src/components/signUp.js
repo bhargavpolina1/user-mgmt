@@ -28,8 +28,7 @@ import validator from "validator";
       enteredPasswordError:"",
       confirmPasswordError:"",
       photo:"",
-      photoName:"",
-      photoSize:"",
+      photoError:"",
       isDisabled: false,
       nameObtained: false,
       ageObtained: false,
@@ -37,7 +36,6 @@ import validator from "validator";
       eMailObtained: false,
       passwordMetRules: false,
       passwordsMatched: false,
-
     }
 
   validateFields = (
@@ -127,7 +125,7 @@ import validator from "validator";
     }
 
     this.setState(stateToUpdate,() => {
-      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched){
+      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched& this.state.photoError === ""){
         axios.post('http://localhost:8080/api/users/',{
         name:this.state.name,
         age:this.state.age,
@@ -139,7 +137,8 @@ import validator from "validator";
         console.log(res)
         if(res.status === 200){
           this.setState({
-            successMessage:"User added successfully"
+            isDisabled: true,
+            successMessage:"Account created sucessfully. Thank you for joining us!!!"
           })
         }else{
           this.setState({
@@ -204,12 +203,22 @@ import validator from "validator";
     }
 
     handleFileUpload = async(event) => {
+      const imageType = /image.*/
       console.log(event.target.files);
       const file = event.target.files[0];
-      const base64=await this.convertBase64(file);
+      if (file.type.match(imageType)) {
+        const base64=await this.convertBase64(file);
       this.setState({
-        photo:base64
+        photo:base64,
+        photoError:"",
       },() =>console.log(this.state.photo))
+      }else{
+        this.setState({
+          photo:"",
+          photoError:"Image type not valid"
+        })
+      }
+      
     }
 
     handleNewUser = (e) => {
@@ -281,13 +290,14 @@ import validator from "validator";
           </div>
         <Form.Item label="Photo">
           <Input type="file" onChange={this.handleFileUpload} size="medium"/>
+          <p style={{color:"red",marginBottom:"0"}}>{this.state.photoError}</p>
         </Form.Item>
         <Form.Item>
-          <Button type="submit" style={{marginRight:".3rem"}} onClick = {this.handleNewUser}>Submit</Button>
+          <Button disabled = {this.state.isDisabled} type="submit" style={{marginRight:".3rem"}} onClick = {this.handleNewUser}>Submit</Button>
           <Link to = '/'><Button type='primary'>Back</Button></Link>
         </Form.Item>
        </Form>
-       <p style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</p>
+       <h3 style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</h3>
       </Col>
     </Row>
         </div>

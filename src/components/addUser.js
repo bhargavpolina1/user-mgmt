@@ -33,6 +33,7 @@ import validator from "validator";
       enteredPasswordError:"",
       confirmPasswordError:"",
       photoAdded:"",
+      photoError:"",
       isDisabled: false,
       nameObtained: false,
       ageObtained: false,
@@ -131,7 +132,7 @@ import validator from "validator";
     }
 
     this.setState(stateToUpdate,() => {
-      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched){
+      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched && this.state.photoError === ""){
         axios.post('http://localhost:8080/api/users/',{
         name:this.state.enteredName,
         age:this.state.enteredAge,
@@ -144,6 +145,7 @@ import validator from "validator";
         console.log(res)
         if(res.status === 200){
           this.setState({
+            isDisabled:true,
             successMessage:"User added successfully",
             errorMessage:""
           })
@@ -157,13 +159,11 @@ import validator from "validator";
         console.log(err)
         this.setState({
           successMessage:"",
-          errorMessage:err.response.data.errorMessage
+          errorMessage: err.response.data.errorMessage
 
         })
       })
-
       }
-
     })
 
   }
@@ -219,12 +219,21 @@ import validator from "validator";
     }
 
     handleFileUpload = async(event) => {
+      const imageType = /image.*/
       console.log(event.target.files);
       const file = event.target.files[0];
-      const base64=await this.convertBase64(file);
+      if (file.type.match(imageType)) {
+        const base64=await this.convertBase64(file);
       this.setState({
-        photo:base64
+        photo:base64,
+        photoError:"",
       },() =>console.log(this.state.photo))
+      }else{
+        this.setState({
+          photo:"",
+          photoError:"Image type not valid"
+        })
+      }
     }
     handleMultipleUSerAddition = () => {
       console.log("Trying to add multiple");
@@ -324,17 +333,17 @@ import validator from "validator";
         </div>
         <Form.Item label="Photo" style = {{margin:"10px"}}>
           <Input type="file" onChange={this.handleFileUpload} size="medium"/>
+          <p style ={{color:"red",marginBottom:"0"}}>{this.state.photoError}</p>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" onClick = {this.handleNewUser} style = {{marginRight:"0.3rem"}}>Submit</Button>
+          <Button disabled = {this.state.isDisabled} type="primary" onClick = {this.handleNewUser} style = {{marginRight:"0.3rem"}}>Submit</Button>
           <Link to = "/admin/userdetails">
           <Button type = "primary">Back</Button>
           </Link>
         </Form.Item>
       </Form>
-    </div>
-                
-       <p style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</p>
+    </div>       
+       <h1 style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</h1>
        <p>{this.state.errorMessage}</p>
       </Col>
     </Row>
