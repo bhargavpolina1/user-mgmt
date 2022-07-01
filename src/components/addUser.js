@@ -130,7 +130,41 @@ import validator from "validator";
       stateToUpdate.passwordsMatched = true;
     }
 
-    this.setState(stateToUpdate)
+    this.setState(stateToUpdate,() => {
+      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordMetRules){
+        axios.post('http://localhost:8080/api/users/',{
+        name:this.state.enteredName,
+        age:this.state.enteredAge,
+        mobileNumber:this.state.enteredMobileNumber,
+        eMail:this.state.enteredEmail,
+        pwd:this.state.confirmPassword,
+        photo:this.state.photo
+
+      }).then((res) =>{
+        console.log(res)
+        if(res.status === 200){
+          this.setState({
+            successMessage:"User added successfully",
+            errorMessage:""
+          })
+        }else{
+          this.setState({
+            errorMessage:"Error while adding user",
+            successMessage:""
+          })
+        }
+      }).catch((err) => {
+        console.log(err)
+        this.setState({
+          successMessage:"",
+          errorMessage:err.response.data.errorMessage
+
+        })
+      })
+
+      }
+
+    })
 
   }
 
@@ -219,39 +253,6 @@ import validator from "validator";
           this.state.enteredEmail,
           this.state.enteredPassword,
           this.state.confirmPassword)
-
-      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordMetRules){
-        axios.post('http://localhost:8080/api/users/',{
-        name:this.state.enteredName,
-        age:this.state.enteredAge,
-        mobileNumber:this.state.enteredMobileNumber,
-        eMail:this.state.enteredEmail,
-        pwd:this.state.confirmPassword,
-        photo:this.state.photo
-
-      }).then((res) =>{
-        console.log(res)
-        if(res.status === 200){
-          this.setState({
-            successMessage:"User added successfully",
-            errorMessage:""
-          })
-        }else{
-          this.setState({
-            errorMessage:"Error while adding user",
-            successMessage:""
-          })
-        }
-      }).catch((err) => {
-        console.log(err)
-        this.setState({
-          successMessage:"",
-          errorMessage:err.response.data.errorMessage
-
-        })
-      })
-
-      }
     }
 
 

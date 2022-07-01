@@ -126,8 +126,30 @@ import validator from "validator";
       stateToUpdate.passwordsMatched = true;
     }
 
-    this.setState(stateToUpdate,() => console.log(this.state.name,this.state.age))
+    this.setState(stateToUpdate,() => {
+      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched){
+        axios.post('http://localhost:8080/api/users/',{
+        name:this.state.name,
+        age:this.state.age,
+        mobileNumber:this.state.mobileNumber,
+        eMail:this.state.eMail,
+        pwd:this.state.confirmPassword,
+        photo:this.state.photo
+      }).then((res) =>{
+        console.log(res)
+        if(res.status === 200){
+          this.setState({
+            successMessage:"User added successfully"
+          })
+        }else{
+          this.setState({
+            successMessage:""
+          })
+        }
+      }).catch((err) => console.log(err))
 
+      }
+    })
   }
 
     onNameChange =(event)=> {
@@ -198,29 +220,6 @@ import validator from "validator";
           this.state.eMail,
           this.state.password,
           this.state.confirmPassword)
-
-      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordMetRules){
-        axios.post('http://localhost:8080/api/users/',{
-        name:this.state.name,
-        age:this.state.age,
-        mobileNumber:this.state.mobileNumber,
-        eMail:this.state.eMail,
-        pwd:this.state.confirmPassword,
-        photo:this.state.photo
-      }).then((res) =>{
-        console.log(res)
-        if(res.status === 200){
-          this.setState({
-            successMessage:"User added successfully"
-          })
-        }else{
-          this.setState({
-            successMessage:""
-          })
-        }
-      }).catch((err) => console.log(err))
-
-      }
     }
   render(){
     return (

@@ -69,29 +69,10 @@ import UserLogin from './userLogin';
       stateToUpdate.passwordValid = true;
     }
 
-    this.setState(stateToUpdate)
-
-    }
-
-    handleEmailChange = (event)=> {
-      this.setState({
-        enteredEmail:event.target.value
-      },() => console.log(this.state.enteredEmail))
-    }
-
-    handlePasswordChange = (event)=> {
-      this.setState({
-        enteredPassword:event.target.value
-      },() => console.log(this.state.enteredPassword))
-    }
-
-    handleSign = async() => {
-      console.log("Login clicked")
-
-      this.validateMailAndPwd(this.state.enteredEmail,this.state.enteredPassword)
+    this.setState(stateToUpdate,() => {
 
       if(this.state.emailValid && this.state.passwordValid){
-        await axios.post('http://localhost:8080/api/users/login',{
+        axios.post('http://localhost:8080/api/users/login',{
         eMail:this.state.enteredEmail,
         pwd:this.state.enteredPassword,
       }).then((res) =>{
@@ -103,8 +84,7 @@ import UserLogin from './userLogin';
               successMessage:"User login successful",
               renderUsers:true,
               isAdmin:true,
-              showDetails:false
-              
+              showDetails:false  
             },() => console.log(this.state.renderUsers))
           }else{
             this.setState({
@@ -126,6 +106,29 @@ import UserLogin from './userLogin';
         })
       })
       }
+      
+    })
+
+
+
+    }
+
+    handleEmailChange = (event)=> {
+      this.setState({
+        enteredEmail:event.target.value
+      },() => console.log(this.state.enteredEmail))
+    }
+
+    handlePasswordChange = (event)=> {
+      this.setState({
+        enteredPassword:event.target.value
+      },() => console.log(this.state.enteredPassword))
+    }
+
+    handleSign = () => {
+      console.log("Login clicked")
+
+      this.validateMailAndPwd(this.state.enteredEmail,this.state.enteredPassword)
     }
     
   render(){
