@@ -287,7 +287,7 @@ import validator from "validator";
           <Link to = '/'><Button type='primary'>Back</Button></Link>
         </Form.Item>
        </Form>
-       <p>{this.state.successMessage}</p>
+       <p style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</p>
       </Col>
     </Row>
         </div>

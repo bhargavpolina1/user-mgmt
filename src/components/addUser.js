@@ -131,7 +131,7 @@ import validator from "validator";
     }
 
     this.setState(stateToUpdate,() => {
-      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordMetRules){
+      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched){
         axios.post('http://localhost:8080/api/users/',{
         name:this.state.enteredName,
         age:this.state.enteredAge,
@@ -334,7 +334,7 @@ import validator from "validator";
       </Form>
     </div>
                 
-       <p>{this.state.successMessage}</p>
+       <p style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</p>
        <p>{this.state.errorMessage}</p>
       </Col>
     </Row>
