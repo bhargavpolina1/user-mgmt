@@ -5,12 +5,13 @@ import {
     Col,
     Form,
     Input,
-    Row,Modal
+    Row
   } from 'antd';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import validator from "validator";
+import ReactFileReader from 'react-file-reader';
 
 
   class UserDetails extends Component {
@@ -23,6 +24,7 @@ import validator from "validator";
       enteredPassword:"",
       confirmPassword:"",
       photo:"",
+      obtainedJson:"",
       successMessage:"",
       modalNeeded:false,
       nameError:"",
@@ -44,7 +46,7 @@ import validator from "validator";
       errorMessage:""
 
     }
-
+obtainedJson = "";
   validateFields = (
     enteredName,
     enteredAge,
@@ -242,18 +244,65 @@ import validator from "validator";
       })
     }
 
-    handleUpload = () => {
+    handleBulkUpload = () => {
       console.log("Upload clicked")
-      this.setState({
-        modalNeeded:false
-      })
     }
-    handleUploadCancel = () => {
-      console.log("cancel CSV file upload clicked")
-      this.setState({
-        modalNeeded:false
-      })
+    
+
+    handleFiles = files => {
+      var reader = new FileReader();
+      reader.onload = (e) => {
+      // Use reader.result
+      var csv = reader.result;
+      console.log(csv,csv.length)
+      var lines = csv.split("\n");
+      console.log(lines)
+      var result = [];
+      var headers=lines[0].split(",");
+      for(var i=1;i<lines.length;i++){
+        var obj = {};
+        var currentline=lines[i].split(",");
+        for(var j=0;j<headers.length;j++){
+          obj[headers[j]] = currentline[j];
+        }
+        result.push(obj);
+        }
+        console.log(result)
+        //return result; //JavaScript object
+        result = JSON.stringify(result); //JSON
+          this.setState({
+            obtainedJson:JSON.parse(result)
+          },() => {
+            console.log(this.state.obtainedJson[0])
+            const email = (this.state.obtainedJson[0]["eMail"])
+            console.log(email)
+            
+            //   axios.post('http://localhost:8080/api/users/',{
+            //   name:this.state.obtainedJson[0].name,
+            //   age:this.state.obtainedJson[0].age,
+            //   mobileNumber:this.state.obtainedJson[0].mobileNumber,
+            //   eMail:this.state.obtainedJson[0].eMail,
+            //   pwd:pwd,
+            //   photo:this.state.photo
+      
+            // }).then((res) =>{
+            //   console.log(res)
+            //   if(res.status === 200){
+            //     console.log("User added from CSV data")
+            //   }
+            // }).catch((err) => {
+            //   console.log(err)
+            //   this.setState({
+            //     successMessage:"",
+            //     errorMessage: err.response.data.errorMessage
+      
+            //   })
+            // })
+          }
+          )
     }
+    reader.readAsText(files[0])
+  }
 
     handleNewUser = () => {
       this.validateFields(this.state.enteredName,
@@ -268,16 +317,13 @@ import validator from "validator";
   render(){
     return (
         <div>
-          <Modal
-          title="Upload CSV file"
-          visible={this.state.modalNeeded}
-          okText = "Upload"
-          onOk={this.handleUpload}
-          onCancel={this.handleUploadCancel}>
-          <Input type="file"/>
-</Modal>
+            <div>
+            <h1>Add bulk users</h1>
+            <ReactFileReader handleFiles={this.handleFiles}>
+              <button type = "primary">Upload</button>
+            </ReactFileReader>
+            </div>
             <h1> Enter the details of the user below</h1>
-            <Button type='primary' onClick = {this.handleMultipleUSerAddition}>Add bulk users</Button>
             <Row justify="center">
                 <Col>
                 <div>
@@ -342,7 +388,7 @@ import validator from "validator";
           </Link>
         </Form.Item>
       </Form>
-    </div>       
+    </div>
        <h1 style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</h1>
        <p>{this.state.errorMessage}</p>
       </Col>
