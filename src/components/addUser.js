@@ -11,7 +11,9 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import validator from "validator";
-import ReactFileReader from 'react-file-reader';
+import papa from "papaparse";
+
+
 
 
   class UserDetails extends Component {
@@ -43,10 +45,10 @@ import ReactFileReader from 'react-file-reader';
       eMailObtained: false,
       passwordMetRules: false,
       passwordsMatched: false,
-      errorMessage:""
+      errorMessage:"",
 
     }
-obtainedJson = "";
+  obtainedJson = "";
   validateFields = (
     enteredName,
     enteredAge,
@@ -249,60 +251,78 @@ obtainedJson = "";
     }
     
 
-    handleFiles = files => {
-      var reader = new FileReader();
-      reader.onload = (e) => {
-      // Use reader.result
-      var csv = reader.result;
-      console.log(csv)
-      var lines = csv.split("\n");
-      console.log(lines)
-      var result = [];
-      var columnNames=lines[0].split(",");
-      for(var i=1;i<lines.length;i++){
-        var obj = {};
-        var userDetails=lines[i].split(",");
-        for(var j=0;j<columnNames.length;j++){
-          obj[columnNames[j]] = userDetails[j];
-        }
-        result.push(obj);
-        }
-        console.log(result)
-        //return result; //JavaScript object
-        result = JSON.stringify(result); //JSON
-          this.setState({
-            obtainedJson:JSON.parse(result)
-          },() => {
-            console.log(this.state.obtainedJson[0])
-            const email = (this.state.obtainedJson[0]["eMail"])
-            console.log(email)
-            
-            //   axios.post('http://localhost:8080/api/users/',{
-            //   name:this.state.obtainedJson[0].name,
-            //   age:this.state.obtainedJson[0].age,
-            //   mobileNumber:this.state.obtainedJson[0].mobileNumber,
-            //   eMail:this.state.obtainedJson[0].eMail,
-            //   pwd:pwd,
-            //   photo:this.state.photo
+    handleFiles = (event) => {
+
+    const reqFile = event.target.files[0];
+    papa.parse(reqFile, {
+      header:true,
+      dynamicTyping:true,
+      skipEmptyLines:true,
+      preview:100,
+      complete(result){
+      this.obtainedJson = result.data;
+      console.log(this.obtainedJson)
+      if(this.obtainedJson !== "") {
+        console.log("Inside post data");
+        for(let i = 0;i<this.obtainedJson.length;i++){
+          axios.post('http://localhost:8080/api/users/',{
+            name:this.obtainedJson[i].name,
+            age:this.obtainedJson[i].age,
+            mobileNumber:this.obtainedJson[i].mobileNumber,
+            eMail:this.obtainedJson[i].eMail,
+            pwd:this.obtainedJson[i].pwd,
+            photo:this.obtainedJson[i].photo
+            }).then((res) =>{
+               console.log(res)
+             if(res.status === 200){
+                console.log("User added from CSV data")
+              }
+             }).catch((err) => {
+               console.log(err)
+              // this.setState({
+              //   successMessage:"",
+              //   errorMessage: err.response.data.errorMessage
       
-            // }).then((res) =>{
-            //   console.log(res)
-            //   if(res.status === 200){
-            //     console.log("User added from CSV data")
-            //   }
-            // }).catch((err) => {
-            //   console.log(err)
-            //   this.setState({
-            //     successMessage:"",
-            //     errorMessage: err.response.data.errorMessage
-      
-            //   })
-            // })
-          }
-          )
+               })
+
+        }
+        console.log(this.obtainedJson[0]);
+        
+
+      }
     }
-    reader.readAsText(files[0])
-  }
+    })
+    }
+    postData = (obtainedJson) => {
+      console.log("upload initiated")
+      if(obtainedJson !== "") {
+        console.log("Inside post data")
+        console.log(this.obtainedJson[0])
+
+
+          axios.post('http://localhost:8080/api/users/',{
+            name:this.obtainedJson[0].name,
+            age:this.obtainedJson[0].age,
+            mobileNumber:this.obtainedJson[0].mobileNumber,
+            eMail:this.obtainedJson[0].eMail,
+            pwd:this.obtainedJson[0].pwd,
+            photo:this.obtainedJson[0].photo
+            }).then((res) =>{
+               console.log(res)
+             if(res.status === 200){
+                console.log("User added from CSV data")
+              }
+             }).catch((err) => {
+               console.log(err)
+              // this.setState({
+              //   successMessage:"",
+              //   errorMessage: err.response.data.errorMessage
+      
+               })
+          }
+          }
+      
+  
 
     handleNewUser = () => {
       this.validateFields(this.state.enteredName,
@@ -319,9 +339,11 @@ obtainedJson = "";
         <div>
             <div>
             <h1>Add bulk users</h1>
-            <ReactFileReader handleFiles={this.handleFiles}>
-              <button type = "primary">Upload</button>
-            </ReactFileReader>
+          <div>
+            <Input type="file" onChange={this.handleFiles} size="medium"/>
+            <Button type='primary' onClick = {() => this.postData(this.obtainedJson)}>Upload</Button>
+            <p style ={{color:"red",marginBottom:"0"}}>{this.state.photoError}</p>
+          </div>
             </div>
             <h1> Enter the details of the user below</h1>
             <Row justify="center">
