@@ -73,7 +73,7 @@ const headers =[
       bulkUploadSuccess:"",
       bulkUploadFileTypeError:"",
       successfulUsers:0,
-      addBulkDisabled:false
+      addBulkDisabled:true
 
     }
   obtainedJson = "";
@@ -283,6 +283,13 @@ const headers =[
     handleFiles = (event) => {
 
     const reqFile = event.target.files[0];
+    console.log(reqFile)
+
+    if (reqFile === undefined){
+      this.setState({
+        addBulkDisabled:true
+      })
+    }
 
     if(reqFile.type === "text/csv"){
       
@@ -294,12 +301,12 @@ const headers =[
       preview:1000,
       complete(result){
       this.obtainedJson = result.data;
-      self.setState({obtainedJson:result.data,bulkUploadFileTypeError:""},() => console.log(self.state.obtainedJson))
+      self.setState({obtainedJson:result.data,bulkUploadFileTypeError:"",addBulkDisabled:false},() => console.log(self.state.obtainedJson))
     }
     })
 
     }else{
-      this.setState({bulkUploadFileTypeError:"Invalid file type. Select a csv file"},() => console.log(this.state.bulkUploadFileTypeError))
+      this.setState({bulkUploadFileTypeError:"Invalid file type. Select a csv file",addBulkDisabled:true},() => console.log(this.state.bulkUploadFileTypeError))
 
     }
     }
