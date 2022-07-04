@@ -12,8 +12,28 @@ import { Link } from 'react-router-dom';
 import axios from "axios";
 import validator from "validator";
 import papa from "papaparse";
+import { CSVLink } from 'react-csv';
 
-
+const headers =[
+{
+  label:'name',key:'name'
+},
+{
+  label:'age',key:'age'
+},
+{
+  label:"mobileNumber",key:"mobileNumber"
+},
+{
+  label:"eMail",key:"eMail"
+},
+{
+  label:"pwd",key:"pwd"
+},
+{
+  label:"errorMessage",key:"errorMessage"
+}
+]
 
 
   class UserDetails extends Component {
@@ -26,7 +46,7 @@ import papa from "papaparse";
       enteredPassword:"",
       confirmPassword:"",
       photo:"",
-      obtainedJson:"",
+      obtainedJson:[],
       successMessage:"",
       modalNeeded:false,
       nameError:"",
@@ -38,6 +58,7 @@ import papa from "papaparse";
       confirmPasswordError:"",
       photoAdded:"",
       photoError:"",
+      errorEntries:[],
       isDisabled: false,
       nameObtained: false,
       ageObtained: false,
@@ -46,6 +67,12 @@ import papa from "papaparse";
       passwordMetRules: false,
       passwordsMatched: false,
       errorMessage:"",
+      bulkUploadError:"",
+      csvDetails:[],
+      errorInBulkUpload:false,
+      bulkUploadSuccess:"",
+      bulkUploadFileTypeError:"",
+      successfulUsers:0
 
     }
   obtainedJson = "";
@@ -251,78 +278,91 @@ import papa from "papaparse";
     }
     
 
+
     handleFiles = (event) => {
 
     const reqFile = event.target.files[0];
+
+    if(reqFile.type === "text/csv"){
+      
+    const self = this;
     papa.parse(reqFile, {
       header:true,
       dynamicTyping:true,
       skipEmptyLines:true,
-      preview:100,
+      preview:1000,
       complete(result){
       this.obtainedJson = result.data;
-      console.log(this.obtainedJson)
-      if(this.obtainedJson !== "") {
-        console.log("Inside post data");
-        for(let i = 0;i<this.obtainedJson.length;i++){
-          axios.post('http://localhost:8080/api/users/',{
-            name:this.obtainedJson[i].name,
-            age:this.obtainedJson[i].age,
-            mobileNumber:this.obtainedJson[i].mobileNumber,
-            eMail:this.obtainedJson[i].eMail,
-            pwd:this.obtainedJson[i].pwd,
-            photo:this.obtainedJson[i].photo
-            }).then((res) =>{
-               console.log(res)
-             if(res.status === 200){
-                console.log("User added from CSV data")
-              }
-             }).catch((err) => {
-               console.log(err)
-              // this.setState({
-              //   successMessage:"",
-              //   errorMessage: err.response.data.errorMessage
-      
-               })
-
-        }
-        console.log(this.obtainedJson[0]);
-        
-
-      }
+      self.setState({obtainedJson:result.data,bulkUploadFileTypeError:""},() => console.log(self.state.obtainedJson))
     }
     })
+
+    }else{
+      this.setState({bulkUploadFileTypeError:"Invalid file type. Select a csv file"},() => console.log(this.state.bulkUploadFileTypeError))
+
     }
-    postData = (obtainedJson) => {
+    }
+    postData = async() => {
+      const allErrorEntries = []
       console.log("upload initiated")
-      if(obtainedJson !== "") {
-        console.log("Inside post data")
-        console.log(this.obtainedJson[0])
-
-
-          axios.post('http://localhost:8080/api/users/',{
-            name:this.obtainedJson[0].name,
-            age:this.obtainedJson[0].age,
-            mobileNumber:this.obtainedJson[0].mobileNumber,
-            eMail:this.obtainedJson[0].eMail,
-            pwd:this.obtainedJson[0].pwd,
-            photo:this.obtainedJson[0].photo
+       if(this.state.obtainedJson) {
+        console.log(this.state.obtainedJson)
+        console.log("Inside post data");
+        for(let i = 0;i<this.state.obtainedJson.length;i++){
+         await axios.post('http://localhost:8080/api/users/',{
+            name:this.state.obtainedJson[i].name,
+            age:this.state.obtainedJson[i].age,
+            mobileNumber:this.state.obtainedJson[i].mobileNumber,
+            eMail:this.state.obtainedJson[i].eMail,
+            pwd:this.state.obtainedJson[i].pwd,
+            photo:this.state.obtainedJson[i].photo
             }).then((res) =>{
                console.log(res)
              if(res.status === 200){
+              this.setState({
+                successfulUsers:this.state.successfulUsers+1
+              })
+
                 console.log("User added from CSV data")
               }
+             
              }).catch((err) => {
-               console.log(err)
-              // this.setState({
-              //   successMessage:"",
-              //   errorMessage: err.response.data.errorMessage
-      
+              let errorEntry = this.state.obtainedJson[i];
+              console.log(errorEntry)
+              errorEntry["errorMessage"] = err.response.data.message;
+              allErrorEntries.push(errorEntry)
                })
+        }
+        this.setState({errorEntries:allErrorEntries},() => {
+          console.log(this.state.errorEntries.length)
+          if(this.state.errorEntries.length !== 0){
+            const csvReport = {
+              filename:"userswitherrors.csv",
+              headers:headers,
+              data:this.state.errorEntries
+            }
+            this.setState({
+              csvDetails:csvReport,
+              errorInBulkUpload:true,
+              bulkUploadSuccess:"",
+              bulkUploadError:`Error in details of ${csvReport.data.length} user(s). Correct and retry`
+            })
+
+          }else{
+            this.setState({ 
+              csvDetails:[],
+              errorInBulkUpload:false,
+              bulkUploadSuccess:`${this.state.successfulUsers} user(s) added successfully.`,
+              bulkUploadError:""
+              
+            })
+
           }
+          
+          
+        })
+      }
           }
-      
-  
 
     handleNewUser = () => {
       this.validateFields(this.state.enteredName,
@@ -332,8 +372,7 @@ import papa from "papaparse";
           this.state.enteredPassword,
           this.state.confirmPassword)
     }
-
-
+    
   render(){
     return (
         <div>
@@ -341,8 +380,11 @@ import papa from "papaparse";
             <h1>Add bulk users</h1>
           <div>
             <Input type="file" onChange={this.handleFiles} size="medium"/>
-            <Button type='primary' onClick = {() => this.postData(this.obtainedJson)}>Upload</Button>
-            <p style ={{color:"red",marginBottom:"0"}}>{this.state.photoError}</p>
+            <p style ={{color:"red",marginBottom:"0"}}>{this.state.bulkUploadFileTypeError}</p>
+            <Button type='primary' onClick = {this.postData} style={{margin:"10px"}}>Upload</Button>
+            {this.state.errorInBulkUpload?<Button style={{margin:"10px"}} type = 'primary'><CSVLink {...this.state.csvDetails}>Click to download the users with errors</CSVLink></Button>:null}
+            <p style ={{color:"green",marginBottom:"0"}}>{this.state.bulkUploadSuccess}</p>
+            <p style ={{color:"red",marginBottom:"0"}}>{this.state.bulkUploadError}</p>
           </div>
             </div>
             <h1> Enter the details of the user below</h1>
