@@ -72,7 +72,8 @@ const headers =[
       errorInBulkUpload:false,
       bulkUploadSuccess:"",
       bulkUploadFileTypeError:"",
-      successfulUsers:0
+      successfulUsers:0,
+      addBulkDisabled:false
 
     }
   obtainedJson = "";
@@ -345,21 +346,18 @@ const headers =[
               csvDetails:csvReport,
               errorInBulkUpload:true,
               bulkUploadSuccess:"",
+              addBulkDisabled:true,
               bulkUploadError:`Error in details of ${csvReport.data.length} user(s). Correct and retry`
             })
-
           }else{
             this.setState({ 
               csvDetails:[],
               errorInBulkUpload:false,
               bulkUploadSuccess:`${this.state.successfulUsers} user(s) added successfully.`,
-              bulkUploadError:""
-              
+              bulkUploadError:"",
+              addBulkDisabled:true
             })
-
           }
-          
-          
         })
       }
           }
@@ -379,9 +377,9 @@ const headers =[
             <div>
             <h1>Add bulk users</h1>
           <div>
-            <Input type="file" onChange={this.handleFiles} size="medium"/>
+            <Input type="file" style = {{margin:"10px",width:"30vw"}} onChange={this.handleFiles} size="medium"/>
             <p style ={{color:"red",marginBottom:"0"}}>{this.state.bulkUploadFileTypeError}</p>
-            <Button type='primary' onClick = {this.postData} style={{margin:"10px"}}>Upload</Button>
+            <Button type='primary' disabled ={this.state.addBulkDisabled} onClick = {this.postData} style={{margin:"10px"}}>Upload</Button>
             {this.state.errorInBulkUpload?<Button style={{margin:"10px"}} type = 'primary'><CSVLink {...this.state.csvDetails}>Click to download the users with errors</CSVLink></Button>:null}
             <p style ={{color:"green",marginBottom:"0"}}>{this.state.bulkUploadSuccess}</p>
             <p style ={{color:"red",marginBottom:"0"}}>{this.state.bulkUploadError}</p>
