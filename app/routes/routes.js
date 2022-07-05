@@ -7,8 +7,8 @@ module.exports = (app) => {
     //View a user
     router.get("/:id",users.viewOne)
     
-    // Create a new user
-    router.post("/", users.create);
+    // // Create a new user
+    // router.post("/", users.create);
 
     // Update a user
     router.put('/:id',users.updateOne)
@@ -18,7 +18,12 @@ module.exports = (app) => {
 
     // login
     router.post('/login',users.loginUser)
+
+    //Add bulk
+    router.post("/", users.addBulk)
     
     app.use('/api/users', router);
+
+
 
 }

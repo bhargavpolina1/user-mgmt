@@ -45,17 +45,13 @@ class UserLogin extends Component {
                             <img style={{width:"200px"}} src = {eachNews.urlToImage} alt = "img"/>
                             <a rel="noreferrer" style={{display:"block"}} target="_blank" href={eachNews.url}>Read More</a>
                         </div>
-                        
                     )
                 })
                 }
                 
-            </div>:<h1>Data Fetching</h1>}
+            </div>:<h1>Getting latest news. Hold on!!!!</h1>}
         </div>
         )
-            
-        
-
     }
 }
 

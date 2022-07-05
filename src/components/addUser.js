@@ -307,41 +307,33 @@ const headers =[
 
     }else{
       this.setState({bulkUploadFileTypeError:"Invalid file type. Select a csv file",addBulkDisabled:true},() => console.log(this.state.bulkUploadFileTypeError))
-
     }
     }
     postData = async() => {
-      const allErrorEntries = []
       console.log("upload initiated")
        if(this.state.obtainedJson) {
         console.log(this.state.obtainedJson)
         console.log("Inside post data");
-        for(let i = 0;i<this.state.obtainedJson.length;i++){
-         await axios.post('http://localhost:8080/api/users/',{
-            name:this.state.obtainedJson[i].name,
-            age:this.state.obtainedJson[i].age,
-            mobileNumber:this.state.obtainedJson[i].mobileNumber,
-            eMail:this.state.obtainedJson[i].eMail,
-            pwd:this.state.obtainedJson[i].pwd,
-            photo:this.state.obtainedJson[i].photo
+        await axios.post('http://localhost:8080/api/users/',{
+
+          usersObject:this.state.obtainedJson
             }).then((res) =>{
                console.log(res)
              if(res.status === 200){
               this.setState({
-                successfulUsers:this.state.successfulUsers+1
-              })
-
+              successfulUsers:res.data.length,
+              csvDetails:[],
+              errorInBulkUpload:false,
+              bulkUploadSuccess:`All users added successfully.`,
+              bulkUploadError:"",
+              addBulkDisabled:true
+              },() => console.log(this.state.successfulUsers))
                 console.log("User added from CSV data")
               }
              
              }).catch((err) => {
-              let errorEntry = this.state.obtainedJson[i];
-              console.log(errorEntry)
-              errorEntry["errorMessage"] = err.response.data.message;
-              allErrorEntries.push(errorEntry)
-               })
-        }
-        this.setState({errorEntries:allErrorEntries},() => {
+              console.log(err.response.data);
+              this.setState({errorEntries:err.response.data},() => {
           console.log(this.state.errorEntries.length)
           if(this.state.errorEntries.length !== 0){
             const csvReport = {
@@ -356,16 +348,10 @@ const headers =[
               addBulkDisabled:true,
               bulkUploadError:`Error in details of ${csvReport.data.length} user(s). Correct and retry`
             })
-          }else{
-            this.setState({ 
-              csvDetails:[],
-              errorInBulkUpload:false,
-              bulkUploadSuccess:`${this.state.successfulUsers} user(s) added successfully.`,
-              bulkUploadError:"",
-              addBulkDisabled:true
-            })
           }
         })
+
+               })
       }
           }
 

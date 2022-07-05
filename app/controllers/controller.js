@@ -11,9 +11,8 @@ app.use(express.urlencoded({ limit: "10000kb", extended: true }));
 app.use(fileUpload());
 
 
-const {userSchema,loginSchema,editUserSchema} = require("../schema_validator/userSchema")
+const {userSchema,loginSchema,editUserSchema,bulkUserSchema} = require("../schema_validator/userSchema")
 const crypto = require ("crypto");
-
 
 const secretKey = "12345678123456781234567812345678";
 
@@ -21,7 +20,7 @@ const secretKey = "12345678123456781234567812345678";
 exports.create = async(req,res) => {
   
     try{
-    const result = await userSchema.validateAsync(req.body);
+    const result = await userSchema.validateAsync(req.body.values);
 
     const user = {
         name:result.name,
@@ -60,7 +59,6 @@ exports.viewAll = (req,res) => {
             message:err.message|| "Some error occured while retrieving users"
         })
     })
-
 }
 
 //View one user using ID
@@ -98,7 +96,6 @@ exports.updateOne = async(req,res) =>{
     }
 
     console.log(user)
-
     
     const id = req.params.id;
 
@@ -182,3 +179,44 @@ exports.loginUser = async(req,res) => {
                     console.log(err)
                     return res.status(500).send(err)})
                 }
+
+exports.addBulk = async(req,res) => {
+    let usersWithError = []
+    try{
+        const usersFromSheet = req.body.usersObject;
+        let result = []
+        for (let i=0;i<usersFromSheet.length;i++){
+            try{
+                const thisUser  = await userSchema.validateAsync(usersFromSheet[i]);
+                result.push(thisUser)
+                console.log(thisUser)
+            }catch(error) {
+                const thisUserWithError = usersFromSheet[i]
+                thisUserWithError["errorMessage"] = error.message
+                usersWithError.push(thisUserWithError);
+            }
+
+        }
+        //console.log(result)
+        // console.log("");
+        // console.log("");
+        // console.log("");
+        //console.log(usersWithError)
+
+        result.map((eachUser) => {
+            const pwd = eachUser.pwd;
+            const hashedPassword = crypto.createHmac('sha256',secretKey).update(pwd).digest('hex');
+            eachUser.pwd = hashedPassword
+            return eachUser
+        })
+        return User.bulkCreate(result).then((data) => {
+            if (usersWithError.length === 0){
+               return res.send(data)
+            }else{
+                return res.status(500).send(usersWithError|| "Some error occured while creating user")
+            }
+            })
+        }catch(error){
+            return res.status(500).send(error.message|| "Some error occured while creating user")   
+        }
+}

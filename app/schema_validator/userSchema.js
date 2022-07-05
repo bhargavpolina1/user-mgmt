@@ -24,8 +24,21 @@ const editUserSchema = Joi.object({
     makeAdmin:Joi.bool().optional()
 })
 
+const bulkUserSchema = Joi.array().items(
+    Joi.object({
+        name:Joi.string().required().lowercase().trim(),
+        age:Joi.number().required(),
+        mobileNumber:Joi.number().min(1000000000).required(),
+        eMail:Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net','in'] } }).required().lowercase(),
+        pwd:Joi.string().pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^"&*-]).{8,}$/)).required(),
+        photo:Joi.any().optional(),
+        makeAdmin:Joi.bool().optional().default(false)
+    })
+  )
+
 module.exports = {
     userSchema,
     loginSchema,
-    editUserSchema  
+    editUserSchema,
+    bulkUserSchema
 }
