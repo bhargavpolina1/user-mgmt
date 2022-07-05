@@ -36,8 +36,8 @@ import validator from "validator";
       eMailObtained: false,
       passwordMetRules: false,
       passwordsMatched: false,
+      allDetailsToPostArr:[]
     }
-
   validateFields = (
     name,
     age,
@@ -126,26 +126,35 @@ import validator from "validator";
 
     this.setState(stateToUpdate,() => {
       if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched& this.state.photoError === ""){
-        axios.post('http://localhost:8080/api/users/',{
-        name:this.state.name,
-        age:this.state.age,
-        mobileNumber:this.state.mobileNumber,
-        eMail:this.state.eMail,
-        pwd:this.state.confirmPassword,
-        photo:this.state.photo
-      }).then((res) =>{
-        console.log(res)
-        if(res.status === 200){
-          this.setState({
-            isDisabled: true,
-            successMessage:"Account created sucessfully. Thank you for joining us!!!"
-          })
-        }else{
-          this.setState({
-            successMessage:""
-          })
-        }
-      }).catch((err) => console.log(err))
+        const allDetails = {};
+        const allDetailsArr = [];
+        allDetails.name = this.state.name;
+        allDetails.age = this.state.age;
+        allDetails.mobileNumber = this.state.mobileNumber;
+        allDetails.eMail = this.state.eMail;
+        allDetails.pwd = this.state.confirmPassword;
+        allDetails.photo = this.state.photo;
+        allDetailsArr.push(allDetails)
+        this.setState({
+          allDetailsToPostArr:allDetailsArr
+        },() => {
+          axios.post('http://localhost:8080/api/users/',{
+            usersObject:this.state.allDetailsToPostArr
+          }).then((res) =>{
+            console.log(res)
+            if(res.status === 200){
+              this.setState({
+                isDisabled: true,
+                successMessage:"Account created sucessfully. Thank you for joining us!!!"
+              })
+            }else{
+              this.setState({
+                successMessage:""
+              })
+            }
+          }).catch((err) => console.log(err))
+
+        })
 
       }
     })

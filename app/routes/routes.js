@@ -7,9 +7,6 @@ module.exports = (app) => {
     //View a user
     router.get("/:id",users.viewOne)
     
-    // // Create a new user
-    // router.post("/", users.create);
-
     // Update a user
     router.put('/:id',users.updateOne)
 

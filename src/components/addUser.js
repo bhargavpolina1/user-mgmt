@@ -73,6 +73,8 @@ const headers =[
       bulkUploadSuccess:"",
       bulkUploadFileTypeError:"",
       successfulUsers:0,
+      allDetailsToPostArr:[],
+      allDetailsToPostObj:{},
       addBulkDisabled:true
 
     }
@@ -165,14 +167,21 @@ const headers =[
 
     this.setState(stateToUpdate,() => {
       if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched && this.state.photoError === ""){
-        axios.post('http://localhost:8080/api/users/',{
-        name:this.state.enteredName,
-        age:this.state.enteredAge,
-        mobileNumber:this.state.enteredMobileNumber,
-        eMail:this.state.enteredEmail,
-        pwd:this.state.confirmPassword,
-        photo:this.state.photo
-
+        const allDetails = {};
+        const allDetailsArr = [];
+        allDetails.name = this.state.enteredName;
+        allDetails.age = this.state.enteredAge;
+        allDetails.mobileNumber = this.state.enteredMobileNumber;
+        allDetails.eMail = this.state.enteredEmail;
+        allDetails.pwd = this.state.confirmPassword;
+        allDetails.photo = this.state.photo;
+        allDetailsArr.push(allDetails)
+        this.setState({
+          allDetailsToPostArr:allDetailsArr
+        },() => {
+          console.log(`The length of ${this.state.allDetailsToPostArr.length}`)
+            axios.post('http://localhost:8080/api/users/',{
+              usersObject:this.state.allDetailsToPostArr
       }).then((res) =>{
         console.log(res)
         if(res.status === 200){
@@ -195,6 +204,10 @@ const headers =[
 
         })
       })
+
+
+        })
+      
       }
     })
 
