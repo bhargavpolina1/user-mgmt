@@ -10,12 +10,10 @@ app.use(express.json({ limit: "10000kb", extended: true }));
 app.use(express.urlencoded({ limit: "10000kb", extended: true }));
 app.use(fileUpload());
 
-
 const {userSchema,loginSchema,editUserSchema} = require("../schema_validator/userSchema")
 const crypto = require ("crypto");
 
 const secretKey = "12345678123456781234567812345678";
-
 //create and save a user
 exports.create = async(req,res) => {
   

@@ -17,15 +17,12 @@ import UserLogin from './userLogin';
     state = {
       enteredEmail:"",
       enteredPassword:"",
-      successMessage:"",
       eMailError:"",
       passwordError:"",
       errorMessage:"",
       emailValid:false,
       passwordValid:false,
-      renderUsers:false,
       isAdmin:false,
-      isNonAdminUser:false,
       showDetails:true,
     }
 
@@ -47,24 +44,35 @@ import UserLogin from './userLogin';
  
      }
 
-    validateMailAndPwd = (enteredEmail,enteredPassword) => {
-      
-      
-      let stateToUpdate = {}
-      let isValidEmail = validator.isEmail(enteredEmail);
+   
+    onFinish = (e) => {
+      console.log("Login clicked")
+      console.log(e);
+
+      if (e.eMail === undefined || e.pwd === undefined){
+        this.setState({
+          errorMessage:"Enter both email and password to validate"
+        })
+      }
+      else{
+        this.setState({
+          errorMessage:""
+        })
+        let stateToUpdate = {}
+      let isValidEmail = validator.isEmail(e.eMail);
     if (!isValidEmail) {
       stateToUpdate.eMailError = "*Enter a valid mail id";
     } else {
-      stateToUpdate.enteredEmail = enteredEmail;
+      stateToUpdate.enteredEmail = e.eMail;
       stateToUpdate.eMailError = "";
       stateToUpdate.emailValid = true;
     }
 
-    let isValidPassword = validator.isStrongPassword(enteredPassword);
+    let isValidPassword = validator.isStrongPassword(e.pwd);
     if (!isValidPassword) {
-      stateToUpdate.passwordError = "*Entered password is not valid";
+      stateToUpdate.passwordError = "*Entered password didn't meet the requirements";
     } else {
-      stateToUpdate.enteredPassword = enteredPassword;
+      stateToUpdate.enteredPassword = e.pwd;
       stateToUpdate.passwordError = "";
       stateToUpdate.passwordValid = true;
     }
@@ -72,65 +80,46 @@ import UserLogin from './userLogin';
     this.setState(stateToUpdate,() => {
 
       if(this.state.emailValid && this.state.passwordValid){
+        console.log(this.state.enteredEmail , this.state.enteredPassword)
         axios.post('http://localhost:8080/api/users/login',{
         eMail:this.state.enteredEmail,
         pwd:this.state.enteredPassword,
       }).then((res) =>{
         if(res.status === 200){
-          window.sessionStorage.setItem("eMail",this.state.enteredEmail);
-          window.sessionStorage.setItem("pwd",this.state.enteredPassword)
+          window.sessionStorage.setItem("eMail",e.eMail);
+          window.sessionStorage.setItem("pwd",e.pwd)
           if(res.data[0].makeAdmin === 1){
             this.setState({
-              successMessage:"User login successful",
-              renderUsers:true,
               isAdmin:true,
-              showDetails:false  
-            },() => console.log(this.state.renderUsers))
+              showDetails:false
+            })
           }else{
             this.setState({
-              isNonAdminUser:true,
-              successMessage:"Normal user login successful",
-              renderUsers:false,
               isAdmin:false,
               errorMessage:"",
               showDetails:false
-            },() => console.log(this.state.isNonAdminUser))
+            })
           }
         }
       }).catch((err) => {
         console.log(err.response.data)
         this.setState({
           errorMessage:err.response.data,
-          successMessage:"",
           showDetails:true
         })
       })
+      }else{
+        console.log(this.state.enteredEmail,this.state.eMailError,this.state.emailValid,this.state.enteredEmail)
+        console.log("")
+        console.log("")
+        console.log("")
       }
-      
+      console.log(this.state.enteredPassword,this.state.passwordError,this.state.passwordValid,this.state.enteredPassword)
     })
 
 
-
+      }
     }
-
-    handleEmailChange = (event)=> {
-      this.setState({
-        enteredEmail:event.target.value
-      },() => console.log(this.state.enteredEmail))
-    }
-
-    handlePasswordChange = (event)=> {
-      this.setState({
-        enteredPassword:event.target.value
-      },() => console.log(this.state.enteredPassword))
-    }
-
-    handleSign = () => {
-      console.log("Login clicked")
-
-      this.validateMailAndPwd(this.state.enteredEmail,this.state.enteredPassword)
-    }
-    
   render(){
     return(
       this.state.showDetails? <div>
@@ -144,19 +133,17 @@ import UserLogin from './userLogin';
       wrapperCol={{
       span: 24,
       }}
-  layout="vertical">
+  layout="vertical" onFinish={this.onFinish}>
   <Form.Item label="E-Mail">
-    <Input type="email" value={this.state.enteredEmail} onChange = {this.handleEmailChange} placeholder='Enter your e-mail' size="large"/>
+    <Form.Item name="eMail"><Input type="email" placeholder='Enter your e-mail' size="large"/></Form.Item>
     <p style={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
   </Form.Item>
-  <Form.Item>
   <Form.Item label="Password">
-    <Input  placeholder='Enter your password' onChange={this.handlePasswordChange} value = {this.state.enteredPassword} type = "password" size="large"/>
+    <Form.Item name="pwd"><Input.Password  placeholder='Enter your password' size="large"/></Form.Item>
     <p style={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
   </Form.Item>
-  </Form.Item>
   <Form.Item>
-    <Button type="primary" onClick = {this.handleSign} style={{marginRight:".3rem"}}>Log in</Button>
+    <Button type="primary" htmlType='submit' style={{marginRight:".3rem"}}>Log in</Button>
     <Link to = '/'><Button type='primary'>Back</Button></Link>
   </Form.Item>
   <p style={{color:"red",marginBottom:"0"}}>{this.state.errorMessage}</p>
