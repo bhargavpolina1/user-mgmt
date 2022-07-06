@@ -262,6 +262,7 @@ getColumnSearchProps = dataIndex => ({
             title:"Name",
              dataIndex:"name",
               key:"name",
+              sorter: (a, b) => a.name.localeCompare(b.name),
               ...this.getColumnSearchProps('name')
           },
           {
@@ -273,7 +274,11 @@ getColumnSearchProps = dataIndex => ({
               ],
               onFilter:(value,record) => {
                 return record.age <= value
-              }
+              },
+              sorter:(a,b) => a.age - b.age
+              
+
+
           },
           {
             title:"Mobile",
@@ -288,7 +293,9 @@ getColumnSearchProps = dataIndex => ({
                 const strNumber = record.mobileNumber.toString();
 
                 return strNumber[0] === value;
-              }
+              },
+              sorter:(a,b) => a.mobileNumber - b.mobileNumber
+              
           },
           {
             title:"E-Mail",
@@ -322,7 +329,8 @@ getColumnSearchProps = dataIndex => ({
             ],
             onFilter:(value,record) => {
               return record.makeAdmin === value
-            }
+            },
+            sorter: (a, b) => a.makeAdmin-(b.makeAdmin),
           },
           {
             title:"Action",
