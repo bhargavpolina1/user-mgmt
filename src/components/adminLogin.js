@@ -194,112 +194,153 @@ handleLogout = () => {
             makeAdmin:eachUser.makeAdmin
           }
         })
-        const getColumnSearchProps = (dataIndex) => ({
-          filterDropdown: ({selectedKeys, confirm, clearFilters }) => (
-            <div
-              style={{
-                padding: 8,
-              }}
-            >
-              <Input
-                myref={this.state.searchInput}
-                placeholder={`Search ${dataIndex}`}
-                value={selectedKeys[0]}
-                onChange={(e) => 
-                  {
-                    this.setState({
-                      selectedKeys: e.target.value ? [e.target.value] : []
-                    })
-                  }
-                }
-                onPressEnter={() => this.handleSearch(this.state.selectedKeys, confirm, dataIndex)}
-                style={{
-                  marginBottom: 8,
-                  display: 'block',
-                }}
-              />
-              <Space>
-                <Button
-                  type="primary"
-                  onClick={() => this.handleSearch(this.state.selectedKeys, confirm, dataIndex)}
-                  icon={<SearchOutlined />}
-                  size="small"
-                  style={{
-                    width: 90,
-                  }}
-                >
-                  Search
-                </Button>
-                <Button
-                  onClick={() => this.clearFilters && this.handleReset(this.clearFilters)}
-                  size="small"
-                  style={{
-                    width: 90,
-                  }}
-                >
-                  Reset
-                </Button>
-                <Button
-                  type="link"
-                  size="small"
-                  onClick={() => {
-                    confirm({
-                      closeDropdown: false,
-                    });
-                    this.setState({
-                      searchedText:selectedKeys[0],
-                      searchedColumn:dataIndex
-                    })
-                  }}
-                >
-                  Filter
-                </Button>
-              </Space>
-            </div>
-          ),
-          filterIcon: (filtered) => (
-            <SearchOutlined
-              style={{
-                color: filtered ? '#1890ff' : undefined,
-              }}
-            />
-          ),
-          onFilter: (value, record) =>
-            record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-          onFilterDropdownVisibleChange: (visible) => {
-            if (visible) {
-              setTimeout(() => this.state.searchInput.current?.select(), 100);
-            }
-          },
-          render: (text) =>
-            this.state.searchedColumn === dataIndex ? (
-              <Highlighter
-                highlightStyle={{
-                  backgroundColor: '#ffc069',
-                  padding: 0,
-                }}
-                searchWords={[this.state.searchText]}
-                autoEscape
-                textToHighlight={text ? text.toString() : ''}
-              />
-            ) : (
-              text
-            ),
-        })
+        // const getColumnSearchProps = (dataIndex) => ({
+        //   filterDropdown: ({selectedKeys, confirm, clearFilters }) => (
+        //     <div
+        //       style={{
+        //         padding: 8,
+        //       }}
+        //     >
+        //       <Input
+        //         myref={this.state.searchInput}
+        //         placeholder={`Search ${dataIndex}`}
+        //         value={selectedKeys[0]}
+        //         onChange={(e) => 
+        //           {
+        //             this.setState({
+        //               selectedKeys: e.target.value ? [e.target.value] : []
+        //             })
+        //           }
+        //         }
+        //         onPressEnter={() => this.handleSearch(this.state.selectedKeys, confirm, dataIndex)}
+        //         style={{
+        //           marginBottom: 8,
+        //           display: 'block',
+        //         }}
+        //       />
+        //       <Space>
+        //         <Button
+        //           type="primary"
+        //           onClick={() => this.handleSearch(this.state.selectedKeys, confirm, dataIndex)}
+        //           icon={<SearchOutlined />}
+        //           size="small"
+        //           style={{
+        //             width: 90,
+        //           }}
+        //         >
+        //           Search
+        //         </Button>
+        //         <Button
+        //           onClick={() => this.clearFilters && this.handleReset(this.clearFilters)}
+        //           size="small"
+        //           style={{
+        //             width: 90,
+        //           }}
+        //         >
+        //           Reset
+        //         </Button>
+        //         <Button
+        //           type="link"
+        //           size="small"
+        //           onClick={() => {
+        //             confirm({
+        //               closeDropdown: false,
+        //             });
+        //             this.setState({
+        //               searchedText:selectedKeys[0],
+        //               searchedColumn:dataIndex
+        //             })
+        //           }}
+        //         >
+        //           Filter
+        //         </Button>
+        //       </Space>
+        //     </div>
+        //   ),
+        //   filterIcon: (filtered) => (
+        //     <SearchOutlined
+        //       style={{
+        //         color: filtered ? '#1890ff' : undefined,
+        //       }}
+        //     />
+        //   ),
+        //   onFilter: (value, record) =>
+        //     record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+        //   onFilterDropdownVisibleChange: (visible) => {
+        //     if (visible) {
+        //       setTimeout(() => this.state.searchInput.current?.select(), 100);
+        //     }
+        //   },
+        //   render: (text) =>
+        //     this.state.searchedColumn === dataIndex ? (
+        //       <Highlighter
+        //         highlightStyle={{
+        //           backgroundColor: '#ffc069',
+        //           padding: 0,
+        //         }}
+        //         searchWords={[this.state.searchText]}
+        //         autoEscape
+        //         textToHighlight={text ? text.toString() : ''}
+        //       />
+        //     ) : (
+        //       text
+        //     ),
+        // })
 
          const columns = [
           {
             title:"Name",
              dataIndex:"name",
               key:"name",
-              filters:[
-                {text:"Starting with a",value:"a"},
-                {text:"starting with v", value:"v"}
-              ],
-              onFilter:(value,record)=> {
-                return record.name.startsWith(value)
+              filterDropdown: ({
+                selectedKeys,
+                confirm,
+                clearFilters,
+              }) => {
+                return (
+                  <>
+                    <Input
+                      autoFocus
+                      placeholder="Type text here"
+                      value={this.state.selectedKeys[0]}
+                      onChange={(e) => {
+                        this.setState({
+                          selectedKeys:e.target.value ? [e.target.value] : []
+                        },() => console.log(this.state.selectedKeys))
+                        confirm();
+                      }}
+                      onPressEnter={() => {
+                        confirm();
+                      }}
+                      onBlur={() => {
+                        confirm();
+                      }}
+                    ></Input>
+                    <Button
+                      onClick={() => {
+                        confirm();
+                      }}
+                      type="primary"
+                    >
+                      Search
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        clearFilters();
+                      }}
+                      type="danger"
+                    >
+                      Reset
+                    </Button>
+                  </>
+                );
               },
-              ...getColumnSearchProps('name')
+              filterIcon: () => {
+                return <SearchOutlined />;
+              },
+              onFilter: (value, record) => {
+                return record.name.toLowerCase().includes(value.toLowerCase());
+              },
           },
           {
             title:"Age",
