@@ -19,6 +19,7 @@ import validator from "validator";
       password:"",
       confirmPassword:"",
       successMessage:"",
+      errorMessage:"",
       modalNeeded:false,
       nameError:"",
       ageError:"",
@@ -37,161 +38,6 @@ import validator from "validator";
       passwordMetRules: false,
       passwordsMatched: false,
       allDetailsToPostArr:[]
-    }
-  validateFields = (
-    name,
-    age,
-    mobileNumber,
-    eMail,
-    password,
-    confirmPassword
-  ) => {
-
-    console.log("Validation initiated");
-    let stateToUpdate = {};
-
-    let validName = validator.isAlpha(name);
-    if (!validName) {
-      stateToUpdate.nameError =
-        "*Enter a valid name. It should contain only alphabets";
-    } else {
-      stateToUpdate.name = name;
-      stateToUpdate.nameObtained = true;
-      stateToUpdate.nameError = "";
-    }
-
-
-    let isValidAge = validator.isNumeric(age);
-    if (!isValidAge) {
-      stateToUpdate.ageError =
-        "*Enter a valid age. It should contain only numbers";
-    } else {
-      stateToUpdate.age = age;
-      stateToUpdate.ageError = "";
-      stateToUpdate.ageObtained = true;
-    }
-    let isValidMobileNumber = validator.isMobilePhone(
-      mobileNumber,
-      ["en-IN"]
-    )
-
-      if (!isValidMobileNumber) {
-        stateToUpdate.mobileNumberError =
-          "*Enter a valid mobile number. It should contain 10 digits";
-      } else {
-        stateToUpdate.mobileNumber = mobileNumber;
-        stateToUpdate.mobileNumberError = "";
-        stateToUpdate.mobileNumberObtained = true;
-      }
-
-      if (!isValidAge) {
-        stateToUpdate.ageError =
-          "*Enter a valid age. It should contain only numbers";
-      } else {
-        stateToUpdate.age = age;
-        stateToUpdate.ageError = "";
-        stateToUpdate.ageObtained = true;
-      }
-
-    let isValidEmail = validator.isEmail(eMail);
-    if (!isValidEmail) {
-      stateToUpdate.eMailError = "*Enter a valid mail id";
-    } else {
-      stateToUpdate.eMail = eMail;
-      stateToUpdate.eMailError = "";
-      stateToUpdate.eMailObtained = true;
-    }
-
-    let isValidPassword = validator.isStrongPassword(password);
-    if (!isValidPassword) {
-      stateToUpdate.passwordError = "*Entered password didn't meet requirement";
-    } else {
-      stateToUpdate.password = password;
-      stateToUpdate.passwordError = "";
-      stateToUpdate.passwordMetRules = true;
-    }
-
-    let didPasswordsMatch =
-    password !== "" &&
-      confirmPassword !== "" &&
-      password === confirmPassword;
-    if (!didPasswordsMatch) {
-      stateToUpdate.confirmPasswordError =
-        "*Passwords didn't match. Enter same passwords";
-    } else {
-      stateToUpdate.confirmPassword = confirmPassword;
-      stateToUpdate.confirmPasswordError = "";
-      stateToUpdate.passwordsMatched = true;
-    }
-
-    this.setState(stateToUpdate,() => {
-      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched& this.state.photoError === ""){
-        const allDetails = {};
-        const allDetailsArr = [];
-        allDetails.name = this.state.name;
-        allDetails.age = this.state.age;
-        allDetails.mobileNumber = this.state.mobileNumber;
-        allDetails.eMail = this.state.eMail;
-        allDetails.pwd = this.state.confirmPassword;
-        allDetails.photo = this.state.photo;
-        allDetailsArr.push(allDetails)
-        this.setState({
-          allDetailsToPostArr:allDetailsArr
-        },() => {
-          axios.post('http://localhost:8080/api/users/',{
-            usersObject:this.state.allDetailsToPostArr
-          }).then((res) =>{
-            console.log(res)
-            if(res.status === 200){
-              this.setState({
-                isDisabled: true,
-                successMessage:"Account created sucessfully. Thank you for joining us!!!"
-              })
-            }else{
-              this.setState({
-                successMessage:""
-              })
-            }
-          }).catch((err) => console.log(err))
-
-        })
-
-      }
-    })
-  }
-
-    onNameChange =(event)=> {
-      this.setState({
-        name: event.target.value
-      },() => console.log(this.state.name))
-    }
-    
-    onAgeChange = (event)=> {
-      this.setState({
-        age:event.target.value
-      },() => console.log(this.state.age))
-    }
-    
-    onMobileChange = (event) => {
-      this.setState({
-        mobileNumber:event.target.value
-      },() => console.log(this.state.mobileNumber))
-    }
-    
-    onEMailChange = (event) => {
-      this.setState({
-        eMail:event.target.value
-      },() => console.log(this.state.eMail))
-    }
-    onPasswordChange = (event) => {
-      this.setState({
-        password:event.target.value
-      },() => console.log(this.state.password))
-    }
-    onConfirmPasswordChange = (event) => {
-      this.setState({
-        confirmPassword:event.target.value
-      },()=>console.log(this.state.confirmPassword))
     }
 
     convertBase64 = (file) => {
@@ -230,14 +76,124 @@ import validator from "validator";
       
     }
 
-    handleNewUser = (e) => {
-      e.preventDefault();
-      this.validateFields(this.state.name,
-          this.state.age,
-          this.state.mobileNumber,
-          this.state.eMail,
-          this.state.password,
-          this.state.confirmPassword)
+    onFinish = (e) => {
+      console.log(e)
+
+      if(e.name === undefined || e.age === undefined || e.eMail === undefined || e.mobileNumber === undefined || e.password === undefined || e.confirmPassword === undefined){
+        this.setState({
+          errorMessage:"Enter all fields to initiate validation"
+        })
+      }
+
+      else{
+        this.setState({
+          errorMessage:""
+        })
+        let stateToUpdate = {};
+
+    let validName = validator.isAlpha(e.name);
+    if (!validName) {
+      stateToUpdate.nameError =
+        "*Enter a valid name. It should contain only alphabets";
+    } else {
+      stateToUpdate.name = e.name;
+      stateToUpdate.nameObtained = true;
+      stateToUpdate.nameError = "";
+    }
+
+
+    let isValidAge = validator.isNumeric(e.age);
+    if (!isValidAge) {
+      stateToUpdate.ageError =
+        "*Enter a valid age. It should contain only numbers";
+    } else {
+      stateToUpdate.age = e.age;
+      stateToUpdate.ageError = "";
+      stateToUpdate.ageObtained = true;
+    }
+    let isValidMobileNumber = validator.isMobilePhone(
+      e.mobileNumber,
+      ["en-IN"]
+    )
+
+      if (!isValidMobileNumber) {
+        stateToUpdate.mobileNumberError =
+          "*Enter a valid mobile number. It should contain 10 digits";
+      } else {
+        stateToUpdate.mobileNumber = e.mobileNumber;
+        stateToUpdate.mobileNumberError = "";
+        stateToUpdate.mobileNumberObtained = true;
+      }
+
+    let isValidEmail = validator.isEmail(e.eMail);
+    if (!isValidEmail) {
+      stateToUpdate.eMailError = "*Enter a valid mail id";
+    } else {
+      stateToUpdate.eMail = e.eMail;
+      stateToUpdate.eMailError = "";
+      stateToUpdate.eMailObtained = true;
+    }
+
+    let isValidPassword = validator.isStrongPassword(e.password);
+    if (!isValidPassword) {
+      stateToUpdate.passwordError = "*Entered password didn't meet requirement";
+    } else {
+      stateToUpdate.password = e.password;
+      stateToUpdate.passwordError = "";
+      stateToUpdate.passwordMetRules = true;
+    }
+
+    let didPasswordsMatch =
+    e.password !== "" &&
+      e.confirmPassword !== "" &&
+      e.password === e.confirmPassword;
+    if (!didPasswordsMatch) {
+      stateToUpdate.confirmPasswordError =
+        "*Passwords didn't match. Enter same passwords";
+    } else {
+      stateToUpdate.confirmPassword = e.confirmPassword;
+      stateToUpdate.confirmPasswordError = "";
+      stateToUpdate.passwordsMatched = true;
+    }
+
+    this.setState(stateToUpdate,() => {
+      if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched& this.state.photoError === ""){
+        const allDetails = {};
+        const allDetailsArr = [];
+        allDetails.name = this.state.name;
+        allDetails.age = this.state.age;
+        allDetails.mobileNumber = this.state.mobileNumber;
+        allDetails.eMail = this.state.eMail;
+        allDetails.pwd = this.state.confirmPassword;
+        allDetails.photo = this.state.photo;
+        allDetailsArr.push(allDetails)
+        this.setState({
+          allDetailsToPostArr:allDetailsArr
+        },() => {
+          axios.post('http://localhost:8080/api/users/',{
+            usersObject:this.state.allDetailsToPostArr
+          }).then((res) =>{
+            console.log(res)
+            if(res.status === 200){
+              this.setState({
+                isDisabled: true,
+                successMessage:"Account created sucessfully. Thank you for joining us!!!",
+                errorMessage:""
+              })
+            }else{
+              this.setState({
+                successMessage:"",
+              })
+            }
+          }).catch((err) => console.log(err))
+
+        })
+
+      }
+    })
+
+      }
+
     }
   render(){
     return (
@@ -245,39 +201,39 @@ import validator from "validator";
             <h1> Enter your details below to join us</h1>
             <Row justify="center">
                 <Col>
-                <Form method="post" encType="multipart/form-data"
+                <Form method="post" encType="multipart/form-data" 
         labelCol={{
           span: 16,
         }}
         wrapperCol={{
           span: 24,
         }}
-        layout="vertical">
+        layout="vertical" onFinish={this.onFinish}>
           <div>
           <div style = {{display:"flex"}}>
             <div style = {{margin:"10px",width:"30vw"}}>
               <Form.Item label="Name">
-                <Input value={this.state.name} onChange={this.onNameChange} placeholder='Enter your name' size="small"/>
+                <Form.Item name="name"><Input placeholder='Enter your name' size="small"/></Form.Item>
                 <p style={{color:"red",marginBottom:"0"}}>{this.state.nameError}</p>
               </Form.Item>
             </div>
             <div style = {{margin:"10px",width:"30vw"}}>
             <Form.Item label="Age">
-          <Input value={this.state.age} onChange={this.onAgeChange} placeholder='Enter your age' size="small"/>
-          <p style={{color:"red",marginBottom:"0"}}>{this.state.ageError}</p>
-        </Form.Item> 
+            <Form.Item name = "age"><Input placeholder='Enter your age' size="small"/></Form.Item>
+              <p style={{color:"red",marginBottom:"0"}}>{this.state.ageError}</p>
+            </Form.Item>
             </div>
           </div>  
           <div style = {{display:"flex"}}>
             <div style = {{margin:"10px",width:"30vw"}}>
             <Form.Item label="Mobile Number">
-            <Input value={this.state.mobileNumber} onChange={this.onMobileChange} placeholder='Enter your mobile number' size="small"/>
+            <Form.Item name="mobileNumber"><Input placeholder='Enter your mobile number' size="small"/></Form.Item>
             <p style={{color:"red",marginBottom:"0"}}>{this.state.mobileNumberError}</p>
             </Form.Item>
             </div>
             <div style = {{margin:"10px",width:"30vw"}}>
             <Form.Item label="E-Mail">
-            <Input value={this.state.eMail} onChange={this.onEMailChange} type = "email" placeholder='Enter your e-mail' size="small"/>
+            <Form.Item name ="eMail"><Input type = "email" placeholder='Enter your e-mail' size="small"/></Form.Item>
             <p style={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
              </Form.Item>
             </div>
@@ -285,27 +241,28 @@ import validator from "validator";
             <div style = {{display:"flex"}}>
             <div style = {{margin:"10px",width:"30vw"}}>
             <Form.Item label="Password">
-          <Input value={this.state.password} onChange={this.onPasswordChange} type = "password" placeholder='Enter your password' size="small"/>
-          <p style={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
-        </Form.Item>
+            <Form.Item name = "password"><Input.Password type = "password" placeholder='Enter your password' size="small"/></Form.Item>
+              <p style={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
+            </Form.Item>
             </div>
             <div style = {{margin:"10px",width:"30vw"}}>
             <Form.Item label="Re-enter Password">
-          <Input value={this.state.confirmPassword} onChange={this.onConfirmPasswordChange} type = "password" placeholder='Re-enter your password' size="small"/>
-          <p style={{color:"red",marginBottom:"0"}}>{this.state.confirmPasswordError}</p>
-        </Form.Item>
+            <Form.Item name = "confirmPassword"><Input.Password placeholder='Re-enter your password' size="small"/></Form.Item>
+              <p style={{color:"red",marginBottom:"0"}}>{this.state.confirmPasswordError}</p>
+            </Form.Item>
             </div>
             </div>
           </div>
         <Form.Item label="Photo">
-          <Input type="file" onChange={this.handleFileUpload} size="medium"/>
+        <Form.Item name = "photo"><Input type="file" onChange={this.handleFileUpload} size="medium"/></Form.Item>
           <p style={{color:"red",marginBottom:"0"}}>{this.state.photoError}</p>
         </Form.Item>
         <Form.Item>
-          <Button disabled = {this.state.isDisabled} type="submit" style={{marginRight:".3rem"}} onClick = {this.handleNewUser}>Submit</Button>
+          <Button disabled = {this.state.isDisabled} htmlType="submit" style={{marginRight:".3rem"}}>Submit</Button>
           <Link to = '/'><Button type='primary'>Back</Button></Link>
         </Form.Item>
        </Form>
+       <h3 style={{color:"red",marginBottom:"0"}}>{this.state.errorMessage}</h3>
        <h3 style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</h3>
       </Col>
     </Row>
