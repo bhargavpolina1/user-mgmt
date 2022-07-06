@@ -97,6 +97,13 @@ exports.updateOne = async(req,res) =>{
         console.log(user)
         
         const id = req.params.id;
+
+        if (user.pwd){
+            // protected password
+        const passwordTobeProtected  = user.pwd.trim();
+        const hashedPassword = crypto.createHmac('sha256',secretKey).update(passwordTobeProtected).digest('hex');
+        user.pwd=hashedPassword;
+        }
     
         User.update(user,{
             where:{id:id}
@@ -167,6 +174,8 @@ exports.loginUser = async(req,res) => {
 
             const hashedPwdFromServer = data[0].pwd
             const hashedPassword = crypto.createHmac('sha256',secretKey).update(userDetails.pwd).digest('hex');
+            console.log(hashedPwdFromServer)
+            console.log(hashedPassword)
 
             if(hashedPwdFromServer === hashedPassword){
             console.log(data)
