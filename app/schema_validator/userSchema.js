@@ -21,6 +21,7 @@ const editUserSchema = Joi.object({
     age:Joi.number().optional(),
     mobileNumber:Joi.number().min(1000000000).optional(),
     eMail:Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net','in'] } }).optional().lowercase(),
+    pwd:Joi.string().pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^"&*-]).{8,}$/)).optional(),
     makeAdmin:Joi.bool().optional()
 })
 

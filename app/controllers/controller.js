@@ -81,35 +81,36 @@ exports.viewOne = (req,res) => {
     })
 }
 
-
 //Edit a user using ID
 
 exports.updateOne = async(req,res) =>{
-    const result = await editUserSchema.validateAsync(req.body);
-
-    const user = {
-        name:result.name,
-        age:result.age,
-        mobileNumber:result.mobileNumber,
-        eMail:result.eMail,
-        makeAdmin: result.makeAdmin,
-    }
-
-    console.log(user)
-    
-    const id = req.params.id;
-
-    User.update(user,{
-        where:{id:id}
-    }).then((num) => {
-        if(num == 1){
-            return res.send(`User with id: ${id} updated successfully`)
-        }else{
-            return res.status(404).send(`No user exists with the given id:${id} to update`)
+    try{
+        const result = await editUserSchema.validateAsync(req.body);
+        const user = {
+            name:result.name,
+            age:result.age,
+            mobileNumber:result.mobileNumber,
+            eMail:result.eMail,
+            makeAdmin: result.makeAdmin,
+            pwd:result.pwd,
         }
-    }).catch((err) => {
+        console.log(user)
+        
+        const id = req.params.id;
+    
+        User.update(user,{
+            where:{id:id}
+        }).then((num) => {
+            if(num == 1){
+                return res.send(`User with id: ${id} updated successfully`)
+            }else{
+                return res.status(404).send(`No user exists with the given id:${id} to update`)
+            }
+        })
+
+    }catch(err){
             return res.status(500).send(err.message || "Error while updating user with id: " +id)
-    })
+    }
 
 }
 
@@ -142,7 +143,8 @@ exports.deleteOne = (req,res) => {
 
 //Login 
 exports.loginUser = async(req,res) => {
-    const result = await loginSchema.validateAsync(req.body);
+    try{
+        const result = await loginSchema.validateAsync(req.body);
 
     const userDetails = {
         eMail: result.eMail,
@@ -175,9 +177,11 @@ exports.loginUser = async(req,res) => {
                     }else{
                         return res.status(404).send("No user registered with the provided e-mail")
                     }
-                }).catch((err) =>{
+                })
+
+    }catch(err){
                     console.log(err)
-                    return res.status(500).send(err)})
+                    return res.status(500).send(err.message)}
                 }
 
 exports.addBulk = async(req,res) => {
