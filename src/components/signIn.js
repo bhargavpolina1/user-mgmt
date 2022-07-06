@@ -159,7 +159,6 @@ import UserLogin from './userLogin';
     <Button type="primary" onClick = {this.handleSign} style={{marginRight:".3rem"}}>Log in</Button>
     <Link to = '/'><Button type='primary'>Back</Button></Link>
   </Form.Item>
-  <p style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</p>
   <p style={{color:"red",marginBottom:"0"}}>{this.state.errorMessage}</p>
  </Form>
 </Col>

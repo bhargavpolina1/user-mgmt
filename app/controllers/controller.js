@@ -189,19 +189,12 @@ exports.addBulk = async(req,res) => {
             try{
                 const thisUser  = await userSchema.validateAsync(usersFromSheet[i]);
                 result.push(thisUser)
-                console.log(thisUser)
             }catch(error) {
                 const thisUserWithError = usersFromSheet[i]
                 thisUserWithError["errorMessage"] = error.message
                 usersWithError.push(thisUserWithError);
             }
-
         }
-        //console.log(result)
-        // console.log("");
-        // console.log("");
-        // console.log("");
-        //console.log(usersWithError)
 
         result.map((eachUser) => {
             const pwd = eachUser.pwd;
