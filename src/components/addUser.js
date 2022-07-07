@@ -79,6 +79,12 @@ const headers =[
 
     }
   obtainedJson = "";
+
+
+  onFinish = (e) => {
+    console.log(e)
+
+  }
   validateFields = (
     enteredName,
     enteredAge,
@@ -402,31 +408,32 @@ const headers =[
         wrapperCol={{
           span: 24,
         }}
-        layout="vertical">
+        layout="vertical"
+        onFinish={this.onFinish}>
         <div style = {{display:"flex"}}>
           <div style = {{margin:"10px",width:"30vw"}}>
           <Form.Item label="Name" >
-          <Input value = {this.state.enteredName} onChange = {this.onNameChange} placeholder='Enter the name' size="small"/>
+            <Form.Item name="name"><Input placeholder='Enter the name' size="small"/></Form.Item>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.nameError}</p>
         </Form.Item>
           </div>
           <div style = {{margin:"10px",width:"30vw"}}>
           <Form.Item label="Age">
-          <Input type = "number" value = {this.state.enteredAge} onChange = {this.onAgeChange} placeholder='Enter the age' size="small"/>
-          <p style ={{color:"red",marginBottom:"0"}}>{this.state.ageError}</p>
+          <Form.Item name="age"><Input type = "number" placeholder='Enter the age' size="small"/></Form.Item>
+            <p style ={{color:"red",marginBottom:"0"}}>{this.state.ageError}</p>
           </Form.Item>      
           </div>  
         </div>
         <div style = {{display:"flex"}}>
           <div style = {{margin:"10px",width:"30vw"}}>
           <Form.Item label="Mobile Number">
-          <Input type = "number" value = {this.state.enteredMobileNumber} onChange = {this.onMobileChange} placeholder="Enter the mobile number" size="small"/>
-          <p style ={{color:"red",marginBottom:"0"}}>{this.state.mobileNumberError}</p>
+            <Form.Item name="mobileNumber"><Input type = "number"  placeholder="Enter the mobile number" size="small"/></Form.Item>
+            <p style ={{color:"red",marginBottom:"0"}}>{this.state.mobileNumberError}</p>
         </Form.Item>
           </div>
           <div style = {{margin:"10px",width:"30vw"}}>
           <Form.Item label="Email">
-          <Input placeholder='Enter the e-mail' value = {this.state.enteredEmail} onChange = {this.onEMailChange} type="email" size="small"/>
+            <Form.Item name = "eMail"> <Input placeholder='Enter the e-mail' type="email" size="small"/></Form.Item>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
           </Form.Item>
           </div>
@@ -434,23 +441,23 @@ const headers =[
         <div style = {{display:"flex"}}>
           <div style = {{margin:"10px",width:"30vw"}}>
           <Form.Item label="Password">
-          <Input type = "password" value = {this.state.enteredPassword} onChange = {this.onPasswordChange} placeholder='Enter the password' size="small"/>
+            <Form.Item name = "password"><Input.Password type = "password" placeholder='Enter the password' size="small"/></Form.Item>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
         </Form.Item>
           </div>
           <div style = {{margin:"10px",width:"30vw"}}>
           <Form.Item label="Re-enter Password">
-          <Input type = "password" value = {this.state.confirmPassword} onChange = {this.onConfirmPasswordChange} placeholder='Re-enter the password' size="small"/>
-          <p style ={{color:"red",marginBottom:"0"}}>{this.state.confirmPasswordError}</p>
+            <Form.Item name = "confirmPassword"><Input.Password type = "password" placeholder='Re-enter the password' size="small"/></Form.Item>
+            <p style ={{color:"red",marginBottom:"0"}}>{this.state.confirmPasswordError}</p>
         </Form.Item>
           </div>
         </div>
         <Form.Item label="Photo" style = {{margin:"10px"}}>
-          <Input type="file" onChange={this.handleFileUpload} size="medium"/>
+          <Form.Item name = "photo"><Input type="file" onChange={this.handleFileUpload} size="medium"/></Form.Item>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.photoError}</p>
         </Form.Item>
         <Form.Item>
-          <Button disabled = {this.state.isDisabled} type="primary" onClick = {this.handleNewUser} style = {{marginRight:"0.3rem"}}>Submit</Button>
+          <Button disabled = {this.state.isDisabled} type="primary" htmlType='submit' style = {{marginRight:"0.3rem"}}>Submit</Button>
           <Link to = "/admin/userdetails">
           <Button type = "primary">Back</Button>
           </Link>
