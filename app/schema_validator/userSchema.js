@@ -18,7 +18,7 @@ const loginSchema = Joi.object({
 
 const editUserSchema = Joi.object({
     name:Joi.string().optional().lowercase().trim(),
-    age:Joi.number().optional(),
+    age:Joi.number().optional().max(60),
     mobileNumber:Joi.number().min(1000000000).optional(),
     eMail:Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net','in'] } }).optional().lowercase(),
     pwd:Joi.string().pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^"&*-]).{8,}$/)).optional(),
