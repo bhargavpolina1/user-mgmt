@@ -82,43 +82,37 @@ const headers =[
 
 
   onFinish = (e) => {
-    console.log(e)
-
-  }
-  validateFields = (
-    enteredName,
-    enteredAge,
-    enteredMobileNumber,
-    enteredEmail,
-    enteredPassword,
-    confirmPassword
-  ) => {
-
-    console.log("Validation initiated")
-    let validName = validator.isAlpha(enteredName);
+    console.log(e.age)
+    if(e.name === undefined || e.age === undefined || e.eMail === undefined || e.mobileNumber === undefined || e.password === undefined || e.confirmPassword === undefined){
+      this.setState({
+        errorMessage:"Enter all fields to initiate validation"
+      })
+    }else{
+      console.log("Validation initiated")
+    let validName = validator.isAlpha(e.name);
 
     let stateToUpdate = {};
     if (!validName) {
       stateToUpdate.nameError =
         "*Enter a valid name. It should contain only alphabets";
     } else {
-      stateToUpdate.enteredName = enteredName;
+      stateToUpdate.enteredName = e.name;
       stateToUpdate.nameObtained = true;
       stateToUpdate.nameError = "";
     }
 
 
-    let isValidAge = validator.isNumeric(enteredAge);
+    let isValidAge = validator.isNumeric(e.age);
     if (!isValidAge) {
       stateToUpdate.ageError =
         "*Enter a valid age. It should contain only numbers";
     } else {
-      stateToUpdate.age = enteredAge;
+      stateToUpdate.enteredAge = e.age;
       stateToUpdate.ageError = "";
       stateToUpdate.ageObtained = true;
     }
     let isValidMobileNumber = validator.isMobilePhone(
-        enteredMobileNumber,
+        e.mobileNumber,
         ["en-IN"]
       )
 
@@ -126,47 +120,39 @@ const headers =[
         stateToUpdate.mobileNumberError =
           "*Enter a valid mobile number. It should contain 10 digits";
       } else {
-        stateToUpdate.enteredMobileNumber = enteredMobileNumber;
+        stateToUpdate.enteredMobileNumber = e.mobileNumber;
         stateToUpdate.mobileNumberError = "";
         stateToUpdate.mobileNumberObtained = true;
       }
 
-      if (!isValidAge) {
-        stateToUpdate.ageError =
-          "*Enter a valid age. It should contain only numbers";
-      } else {
-        stateToUpdate.age = enteredAge;
-        stateToUpdate.ageError = "";
-        stateToUpdate.ageObtained = true;
-      }
 
-    let isValidEmail = validator.isEmail(enteredEmail);
+    let isValidEmail = validator.isEmail(e.eMail);
     if (!isValidEmail) {
       stateToUpdate.eMailError = "*Enter a valid mail id";
     } else {
-      stateToUpdate.eMail = enteredEmail;
+      stateToUpdate.enteredEmail = e.eMail;
       stateToUpdate.eMailError = "";
       stateToUpdate.eMailObtained = true;
     }
 
-    let isValidPassword = validator.isStrongPassword(enteredPassword);
+    let isValidPassword = validator.isStrongPassword(e.password);
     if (!isValidPassword) {
       stateToUpdate.passwordError = "*Entered password didn't meet requirement";
     } else {
-      stateToUpdate.enteredPassword = enteredPassword;
+      stateToUpdate.enteredPassword = e.password;
       stateToUpdate.passwordError = "";
       stateToUpdate.passwordMetRules = true;
     }
 
     let didPasswordsMatch =
-      enteredPassword !== "" &&
-      confirmPassword !== "" &&
-      enteredPassword === confirmPassword;
+    e.password !== "" &&
+      e.confirmPassword !== "" &&
+      e.password === e.confirmPassword;
     if (!didPasswordsMatch) {
       stateToUpdate.confirmPasswordError =
         "*Passwords didn't match. Enter same passwords";
     } else {
-      stateToUpdate.confirmPassword = confirmPassword;
+      stateToUpdate.confirmPassword = e.confirmPassword;
       stateToUpdate.confirmPasswordError = "";
       stateToUpdate.passwordsMatched = true;
     }
@@ -217,41 +203,10 @@ const headers =[
       }
     })
 
-  }
 
-    onNameChange =(event)=> {
-      this.setState({
-        enteredName: event.target.value
-      },() => console.log(this.state.enteredName))
     }
-    
-    onAgeChange = (event)=> {
-      this.setState({
-        enteredAge:event.target.value
-      },() => console.log(this.state.enteredAge))
-    }
-    
-    onMobileChange = (event) => {
-      this.setState({
-        enteredMobileNumber:event.target.value
-      },() => console.log(this.state.enteredMobileNumber))
-    }
-    
-    onEMailChange = (event) => {
-      this.setState({
-        enteredEmail:event.target.value
-      },() => console.log(this.state.enteredEmail))
-    }
-    onPasswordChange = (event) => {
-      this.setState({
-        enteredPassword:event.target.value
-      },() => console.log(this.state.enteredPassword))
-    }
-    onConfirmPasswordChange = (event) => {
-      this.setState({
-        confirmPassword:event.target.value
-      },()=>console.log(this.state.confirmPassword))
-    }
+
+  }
     convertBase64 = (file) => {
 
       return new Promise((resolve,reject) => {
@@ -374,14 +329,6 @@ const headers =[
       }
           }
 
-    handleNewUser = () => {
-      this.validateFields(this.state.enteredName,
-          this.state.enteredAge,
-          this.state.enteredMobileNumber,
-          this.state.enteredEmail,
-          this.state.enteredPassword,
-          this.state.confirmPassword)
-    }
     
   render(){
     return (
@@ -433,7 +380,7 @@ const headers =[
           </div>
           <div style = {{margin:"10px",width:"30vw"}}>
           <Form.Item label="Email">
-            <Form.Item name = "eMail"> <Input placeholder='Enter the e-mail' type="email" size="small"/></Form.Item>
+            <Form.Item name = "eMail"><Input placeholder='Enter the e-mail' type="email" size="small"/></Form.Item>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.eMailError}</p>
           </Form.Item>
           </div>
@@ -441,7 +388,7 @@ const headers =[
         <div style = {{display:"flex"}}>
           <div style = {{margin:"10px",width:"30vw"}}>
           <Form.Item label="Password">
-            <Form.Item name = "password"><Input.Password type = "password" placeholder='Enter the password' size="small"/></Form.Item>
+            <Form.Item name="password"><Input.Password type = "password" placeholder='Enter the password' size="small"/></Form.Item>
           <p style ={{color:"red",marginBottom:"0"}}>{this.state.passwordError}</p>
         </Form.Item>
           </div>
@@ -465,7 +412,7 @@ const headers =[
       </Form>
     </div>
        <h1 style={{color:"green",marginBottom:"0"}}>{this.state.successMessage}</h1>
-       <p>{this.state.errorMessage}</p>
+       <h3 style={{color:"red",marginBottom:"0"}}>{this.state.errorMessage}</h3>
       </Col>
     </Row>
         </div>
