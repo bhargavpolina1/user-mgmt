@@ -11,6 +11,7 @@ import axios from 'axios';
 import validator from "validator";
 import AdminLogin from './adminLogin';
 import UserLogin from './userLogin';
+import baseUrl from './url';
   
   class SignIn extends Component {
 
@@ -81,7 +82,7 @@ import UserLogin from './userLogin';
 
       if(this.state.emailValid && this.state.passwordValid){
         console.log(this.state.enteredEmail , this.state.enteredPassword)
-        axios.post('http://localhost:8080/api/users/login',{
+        axios.post(baseUrl+'login',{
         eMail:this.state.enteredEmail,
         pwd:this.state.enteredPassword,
       }).then((res) =>{
@@ -109,10 +110,8 @@ import UserLogin from './userLogin';
         })
       })
       }else{
-        console.log(this.state.enteredEmail,this.state.eMailError,this.state.emailValid,this.state.enteredEmail)
-        console.log("")
-        console.log("")
-        console.log("")
+        console.log(this.state.enteredEmail,this.state.eMailError,this.state.emailValid,this.state.enteredEmail,'')
+    
       }
       console.log(this.state.enteredPassword,this.state.passwordError,this.state.passwordValid,this.state.enteredPassword)
     })

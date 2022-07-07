@@ -9,6 +9,7 @@ import {
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import validator from "validator";
+import baseUrl from './url';
   
   class SignUp extends Component {
     state = {
@@ -161,7 +162,7 @@ import validator from "validator";
         this.setState({
           allDetailsToPostArr:allDetailsArr
         },() => {
-          axios.post('http://localhost:8080/api/users/',{
+          axios.post(baseUrl,{
             usersObject:this.state.allDetailsToPostArr
           }).then((res) =>{
             console.log(res)

@@ -13,6 +13,7 @@ import axios from "axios";
 import validator from "validator";
 import papa from "papaparse";
 import { CSVLink } from 'react-csv';
+import baseUrl from './url.js';
 
 const headers =[
 {
@@ -164,7 +165,7 @@ const headers =[
         this.setState({
           allDetailsToPostArr:allDetailsArr
         },() => {
-            axios.post('http://localhost:8080/api/users/',{
+            axios.post( baseUrl,{
               usersObject:this.state.allDetailsToPostArr
       }).then((res) =>{
         console.log(res)
@@ -280,7 +281,7 @@ const headers =[
        if(this.state.obtainedJson) {
         console.log(this.state.obtainedJson)
         console.log("Inside post data");
-        await axios.post('http://localhost:8080/api/users/',{
+        await axios.post(baseUrl,{
 
           usersObject:this.state.obtainedJson
             }).then((res) =>{

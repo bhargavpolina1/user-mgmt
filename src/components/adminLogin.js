@@ -5,6 +5,7 @@ import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import { Table,Switch,Space,Button,Modal,Input } from 'antd';
 import { Link } from "react-router-dom";
+import baseUrl from "./url";
 
 class AdminLogin extends Component {
 
@@ -31,7 +32,7 @@ class AdminLogin extends Component {
   componentDidMount(){
     console.log("Mount initiated")
     axios
-      .get("http://localhost:8080/api/users/")
+      .get(baseUrl)
       .then((res) => {
         console.log(res.data)
         this.setState({
@@ -66,7 +67,7 @@ handleOk =() => {
   this.setState({
     isModelNeedsToPopup:false
   },() => {
-    axios.put(`http://localhost:8080/api/users/${this.state.id}`, {
+    axios.put(baseUrl+`${this.state.id}`, {
     name:this.state.name,
     age:this.state.age,
     mobileNumber:this.state.mobileNumber,
@@ -75,7 +76,7 @@ handleOk =() => {
   },() => console.log(this.state.makeAdmin))
   .then(response => {
     console.log(response);
-    axios.get("http://localhost:8080/api/users/")
+    axios.get(baseUrl)
                 .then(res => {
                   console.log("Re-fetching data")
                 const users = res.data;
@@ -123,9 +124,9 @@ oneEMailChange = (event) => {
 
 handleDelete = (id) => {
   console.log(`Delete request received for id:${id}`)
-  axios.delete(`http://localhost:8080/api/users/${id}`).then((res) => {
+  axios.delete(baseUrl+`${id}`).then((res) => {
     console.log(res)
-    axios.get("http://localhost:8080/api/users/")
+    axios.get(baseUrl)
                 .then(res => {
                   console.log("Re-fetching data")
                 const users = res.data;
