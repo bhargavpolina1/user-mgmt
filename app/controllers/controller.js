@@ -82,6 +82,7 @@ exports.viewOne = (req,res) => {
 //Edit a user using ID
 
 exports.updateOne = async(req,res) =>{
+    const id = req.params.id;
     try{
         const result = await editUserSchema.validateAsync(req.body);
         const user = {
@@ -94,7 +95,6 @@ exports.updateOne = async(req,res) =>{
         }
         console.log(user)
         
-        const id = req.params.id;
 
         if (user.pwd){
             // protected password

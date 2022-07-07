@@ -82,7 +82,6 @@ const headers =[
 
 
   onFinish = (e) => {
-    console.log(e.age)
     if(e.name === undefined || e.age === undefined || e.eMail === undefined || e.mobileNumber === undefined || e.password === undefined || e.confirmPassword === undefined){
       this.setState({
         errorMessage:"Enter all fields to initiate validation"
@@ -96,18 +95,16 @@ const headers =[
       stateToUpdate.nameError =
         "*Enter a valid name. It should contain only alphabets";
     } else {
-      stateToUpdate.enteredName = e.name;
       stateToUpdate.nameObtained = true;
       stateToUpdate.nameError = "";
     }
 
 
-    let isValidAge = validator.isNumeric(e.age);
+    let isValidAge = validator.isNumeric(e.age)&& e.age<=60;
     if (!isValidAge) {
       stateToUpdate.ageError =
-        "*Enter a valid age. It should contain only numbers";
+        "*Enter a valid age. It should contain only numbers and should be less than or equal to 60";
     } else {
-      stateToUpdate.enteredAge = e.age;
       stateToUpdate.ageError = "";
       stateToUpdate.ageObtained = true;
     }
@@ -120,7 +117,6 @@ const headers =[
         stateToUpdate.mobileNumberError =
           "*Enter a valid mobile number. It should contain 10 digits";
       } else {
-        stateToUpdate.enteredMobileNumber = e.mobileNumber;
         stateToUpdate.mobileNumberError = "";
         stateToUpdate.mobileNumberObtained = true;
       }
@@ -130,7 +126,6 @@ const headers =[
     if (!isValidEmail) {
       stateToUpdate.eMailError = "*Enter a valid mail id";
     } else {
-      stateToUpdate.enteredEmail = e.eMail;
       stateToUpdate.eMailError = "";
       stateToUpdate.eMailObtained = true;
     }
@@ -139,7 +134,6 @@ const headers =[
     if (!isValidPassword) {
       stateToUpdate.passwordError = "*Entered password didn't meet requirement";
     } else {
-      stateToUpdate.enteredPassword = e.password;
       stateToUpdate.passwordError = "";
       stateToUpdate.passwordMetRules = true;
     }
@@ -152,7 +146,6 @@ const headers =[
       stateToUpdate.confirmPasswordError =
         "*Passwords didn't match. Enter same passwords";
     } else {
-      stateToUpdate.confirmPassword = e.confirmPassword;
       stateToUpdate.confirmPasswordError = "";
       stateToUpdate.passwordsMatched = true;
     }
@@ -161,17 +154,16 @@ const headers =[
       if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched && this.state.photoError === ""){
         const allDetails = {};
         const allDetailsArr = [];
-        allDetails.name = this.state.enteredName;
-        allDetails.age = this.state.enteredAge;
-        allDetails.mobileNumber = this.state.enteredMobileNumber;
-        allDetails.eMail = this.state.enteredEmail;
-        allDetails.pwd = this.state.confirmPassword;
+        allDetails.name = e.name;
+        allDetails.age = e.age;
+        allDetails.mobileNumber = e.mobileNumber;
+        allDetails.eMail = e.eMail;
+        allDetails.pwd = e.confirmPassword;
         allDetails.photo = this.state.photo;
         allDetailsArr.push(allDetails)
         this.setState({
           allDetailsToPostArr:allDetailsArr
         },() => {
-          console.log(`The length of ${this.state.allDetailsToPostArr.length}`)
             axios.post('http://localhost:8080/api/users/',{
               usersObject:this.state.allDetailsToPostArr
       }).then((res) =>{

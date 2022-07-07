@@ -12,12 +12,6 @@ import validator from "validator";
   
   class SignUp extends Component {
     state = {
-      name:"",
-      age:"",
-      mobileNumber:"",
-      eMail:"",
-      password:"",
-      confirmPassword:"",
       successMessage:"",
       errorMessage:"",
       modalNeeded:false,
@@ -96,18 +90,16 @@ import validator from "validator";
       stateToUpdate.nameError =
         "*Enter a valid name. It should contain only alphabets";
     } else {
-      stateToUpdate.name = e.name;
       stateToUpdate.nameObtained = true;
       stateToUpdate.nameError = "";
     }
 
 
-    let isValidAge = validator.isNumeric(e.age);
+    let isValidAge = validator.isNumeric(e.age) && e.age<=60;
     if (!isValidAge) {
       stateToUpdate.ageError =
-        "*Enter a valid age. It should contain only numbers";
+        "*Enter a valid age. It should contain only numbers and should be less than or equal to 60";
     } else {
-      stateToUpdate.age = e.age;
       stateToUpdate.ageError = "";
       stateToUpdate.ageObtained = true;
     }
@@ -120,7 +112,6 @@ import validator from "validator";
         stateToUpdate.mobileNumberError =
           "*Enter a valid mobile number. It should contain 10 digits";
       } else {
-        stateToUpdate.mobileNumber = e.mobileNumber;
         stateToUpdate.mobileNumberError = "";
         stateToUpdate.mobileNumberObtained = true;
       }
@@ -129,7 +120,6 @@ import validator from "validator";
     if (!isValidEmail) {
       stateToUpdate.eMailError = "*Enter a valid mail id";
     } else {
-      stateToUpdate.eMail = e.eMail;
       stateToUpdate.eMailError = "";
       stateToUpdate.eMailObtained = true;
     }
@@ -138,7 +128,6 @@ import validator from "validator";
     if (!isValidPassword) {
       stateToUpdate.passwordError = "*Entered password didn't meet requirement";
     } else {
-      stateToUpdate.password = e.password;
       stateToUpdate.passwordError = "";
       stateToUpdate.passwordMetRules = true;
     }
@@ -151,20 +140,22 @@ import validator from "validator";
       stateToUpdate.confirmPasswordError =
         "*Passwords didn't match. Enter same passwords";
     } else {
-      stateToUpdate.confirmPassword = e.confirmPassword;
       stateToUpdate.confirmPasswordError = "";
       stateToUpdate.passwordsMatched = true;
     }
+
+
+    
 
     this.setState(stateToUpdate,() => {
       if (this.state.nameObtained && this.state.ageObtained && this.state.eMailObtained && this.state.mobileNumberObtained && this.state.passwordMetRules && this.state.passwordsMatched& this.state.photoError === ""){
         const allDetails = {};
         const allDetailsArr = [];
-        allDetails.name = this.state.name;
-        allDetails.age = this.state.age;
-        allDetails.mobileNumber = this.state.mobileNumber;
-        allDetails.eMail = this.state.eMail;
-        allDetails.pwd = this.state.confirmPassword;
+        allDetails.name = e.name;
+        allDetails.age = e.age;
+        allDetails.mobileNumber = e.mobileNumber;
+        allDetails.eMail = e.eMail;
+        allDetails.pwd = e.confirmPassword;
         allDetails.photo = this.state.photo;
         allDetailsArr.push(allDetails)
         this.setState({
@@ -258,7 +249,7 @@ import validator from "validator";
           <p style={{color:"red",marginBottom:"0"}}>{this.state.photoError}</p>
         </Form.Item>
         <Form.Item>
-          <Button disabled = {this.state.isDisabled} htmlType="submit" style={{marginRight:".3rem"}}>Submit</Button>
+          <Button disabled = {this.state.isDisabled} htmlType="submit" type="primary" style={{marginRight:".3rem"}}>Submit</Button>
           <Link to = '/'><Button type='primary'>Back</Button></Link>
         </Form.Item>
        </Form>
